@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Contacto</h1>
+        <p class="text-muted mb-0">
+            Ponte en contacto con Warrior Gym.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Información de contacto</h4>
+                    <p><i class="fas fa-map-marker-alt text-warning me-2"></i>San José, Costa Rica</p>
+                    <p><i class="fas fa-phone text-warning me-2"></i>+506 0000-0000</p>
+                    <p><i class="fas fa-envelope text-warning me-2"></i>info@warriorgym.cr</p>
+                    <p class="text-muted mb-0">
+                        Esta sección se mantiene como canal informativo mientras se implementan procesos más avanzados de atención.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Formulario de contacto</h4>
+
+                    <form th:action="@{/contacto/enviar}" method="post">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input id="nombre" name="nombre" type="text" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">Correo</label>
+                            <input id="correo" name="correo" type="email" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mensajeContacto" class="form-label">Mensaje</label>
+                            <textarea id="mensajeContacto" name="mensajeContacto" rows="4" class="form-control" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning text-white">
+                            <i class="fas fa-paper-plane me-1"></i> Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

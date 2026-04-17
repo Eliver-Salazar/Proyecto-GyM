@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-dark text-white">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <h1 class="display-4 fw-bold mb-3">
+                    Control de membresías y acceso inteligente para gimnasios
+                </h1>
+                <p class="lead mb-4">
+                    Warrior Gym integra gestión de usuarios, membresías y control operativo
+                    sobre una base Oracle con una interfaz web en Spring Boot + Thymeleaf.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a th:href="@{/login}" class="btn btn-warning text-white btn-lg">
+                        <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+                    </a>
+
+                    <a th:href="@{/nosotros}" class="btn btn-outline-light btn-lg">
+                        Conocer más
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card shadow border-0">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-3">¿Qué permite el sistema?</h4>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-user-check text-warning me-2"></i>
+                                Gestión de usuarios y roles
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-id-card text-warning me-2"></i>
+                                Administración de membresías
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-money-check-alt text-warning me-2"></i>
+                                Base para control de pagos
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-shield-alt text-warning me-2"></i>
+                                Integridad y control sobre Oracle
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                        <h4 class="card-title">Usuarios</h4>
+                        <p class="text-muted">
+                            Registro y consulta de información personal de clientes y personal del gimnasio.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-id-badge fa-3x text-warning mb-3"></i>
+                        <h4 class="card-title">Membresías</h4>
+                        <p class="text-muted">
+                            Asociación de tipos, estados y vigencias para un mejor control administrativo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 shadow border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-database fa-3x text-warning mb-3"></i>
+                        <h4 class="card-title">Base Oracle</h4>
+                        <p class="text-muted">
+                            Información centralizada y estructurada para garantizar integridad referencial.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

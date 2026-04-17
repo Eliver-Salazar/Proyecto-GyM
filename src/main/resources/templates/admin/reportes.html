@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Reportes generales</h1>
+                <p class="text-muted mb-0">
+                    Resumen básico del estado del sistema Warrior Gym.
+                </p>
+            </div>
+            <a th:href="@{/admin}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">Usuarios registrados</h5>
+                    <p class="display-6 fw-bold mb-0"
+                       th:text="${usuarios != null ? #lists.size(usuarios) : 0}">
+                        0
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-id-card fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">Membresías registradas</h5>
+                    <p class="display-6 fw-bold mb-0"
+                       th:text="${membresias != null ? #lists.size(membresias) : 0}">
+                        0
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-layer-group fa-3x"></i>
+                    </div>
+                    <h5 class="card-title">Tipos de membresía</h5>
+                    <p class="display-6 fw-bold mb-0"
+                       th:text="${tiposMembresia != null ? #lists.size(tiposMembresia) : 0}">
+                        0
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Últimos usuarios cargados</h5>
+        </div>
+
+        <div class="card-body" th:if="${usuarios != null and !#lists.isEmpty(usuarios)}">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="u : ${usuarios}">
+                        <td th:text="${u.idUsuario}">1</td>
+                        <td th:text="${(u.nombre != null ? u.nombre : '') + ' ' + (u.apellido != null ? u.apellido : '')}">
+                            Nombre Apellido
+                        </td>
+                        <td th:text="${u.correo}">correo@ejemplo.com</td>
+                        <td th:text="${u.rol != null ? u.rol.nombre : 'SIN ROL'}">SIN ROL</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" th:if="${usuarios == null or #lists.isEmpty(usuarios)}">
+            <div class="alert alert-secondary mb-0">
+                No hay usuarios disponibles para el reporte.
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Resumen de membresías</h5>
+        </div>
+
+        <div class="card-body" th:if="${membresias != null and !#lists.isEmpty(membresias)}">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Vencimiento</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${membresias}">
+                        <td th:text="${m.idMembresia}">1</td>
+                        <td th:text="${m.usuario != null ? ((m.usuario.nombre != null ? m.usuario.nombre : '') + ' ' + (m.usuario.apellido != null ? m.usuario.apellido : '')) : 'Sin usuario'}">
+                            Usuario
+                        </td>
+                        <td th:text="${m.tipoMembresia != null ? m.tipoMembresia.nombre : 'Sin tipo'}">
+                            Sin tipo
+                        </td>
+                        <td th:text="${m.estadoMembresia != null ? m.estadoMembresia.nombreEstado : 'Sin estado'}">
+                            Sin estado
+                        </td>
+                        <td th:text="${m.fechaVencimiento != null ? #temporals.format(m.fechaVencimiento, 'yyyy-MM-dd') : ''}">
+                            2026-01-30
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" th:if="${membresias == null or #lists.isEmpty(membresias)}">
+            <div class="alert alert-secondary mb-0">
+                No hay membresías disponibles para el reporte.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

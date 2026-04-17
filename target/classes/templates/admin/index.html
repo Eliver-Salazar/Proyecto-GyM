@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Panel de administración</h1>
+        <p class="text-muted mb-0">
+            Módulos principales de gestión del sistema Warrior Gym.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h4 class="card-title">Usuarios</h4>
+                    <p class="text-muted">
+                        Consulta de usuarios registrados y sus roles asignados.
+                    </p>
+                    <a th:href="@{/admin/usuarios}" class="btn btn-warning text-white">
+                        Ver usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-id-card fa-3x"></i>
+                    </div>
+                    <h4 class="card-title">Membresías</h4>
+                    <p class="text-muted">
+                        Consulta de tipos de membresía y membresías asignadas.
+                    </p>
+                    <a th:href="@{/admin/membresias}" class="btn btn-warning text-white">
+                        Ver membresías
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-chart-bar fa-3x"></i>
+                    </div>
+                    <h4 class="card-title">Reportes</h4>
+                    <p class="text-muted">
+                        Resumen general del estado actual del sistema.
+                    </p>
+                    <a th:href="@{/admin/reportes}" class="btn btn-warning text-white">
+                        Ver reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

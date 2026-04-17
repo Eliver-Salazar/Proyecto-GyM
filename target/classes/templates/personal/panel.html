@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Panel del personal</h1>
+        <p class="text-muted mb-0">
+            Accesos operativos básicos para colaboradores del gimnasio.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-address-book fa-3x"></i>
+                    </div>
+                    <h4 class="card-title">Socios</h4>
+                    <p class="text-muted">
+                        Consulta de usuarios registrados para apoyo operativo.
+                    </p>
+                    <a th:href="@{/personal/socios}" class="btn btn-warning text-white">
+                        Ver socios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3 text-warning">
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                    <h4 class="card-title">Turnos</h4>
+                    <p class="text-muted">
+                        Vista informativa de turnos y cobertura operativa.
+                    </p>
+                    <a th:href="@{/personal/turnos}" class="btn btn-warning text-white">
+                        Ver turnos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

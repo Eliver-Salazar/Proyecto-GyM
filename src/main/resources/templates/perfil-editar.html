@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Editar perfil</h1>
+        <p class="text-muted mb-0">
+            Actualiza la información personal del usuario autenticado.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Datos personales</h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/perfil/editar}" method="post" th:object="${u}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label fw-semibold">Nombre</label>
+                                <input id="nombre" type="text" class="form-control" th:field="*{nombre}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label fw-semibold">Apellido</label>
+                                <input id="apellido" type="text" class="form-control" th:field="*{apellido}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="correo" class="form-label fw-semibold">Correo</label>
+                                <input id="correo" type="email" class="form-control" th:field="*{correo}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label fw-semibold">Teléfono</label>
+                                <input id="telefono" type="text" class="form-control" th:field="*{telefono}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cedula" class="form-label fw-semibold">Cédula</label>
+                                <input id="cedula" type="text" class="form-control" th:field="*{cedula}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="fechaNacimiento" class="form-label fw-semibold">Fecha de nacimiento</label>
+                                <input id="fechaNacimiento" type="date" class="form-control" th:field="*{fechaNacimiento}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="contactoEmergencia" class="form-label fw-semibold">Contacto de emergencia</label>
+                                <input id="contactoEmergencia" type="text" class="form-control" th:field="*{contactoEmergencia}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="telefonoEmergencia" class="form-label fw-semibold">Teléfono de emergencia</label>
+                                <input id="telefonoEmergencia" type="text" class="form-control" th:field="*{telefonoEmergencia}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="condicionMedica" class="form-label fw-semibold">Condición médica</label>
+                                <textarea id="condicionMedica" class="form-control" rows="3" th:field="*{condicionMedica}"></textarea>
+                            </div>
+
+                            <input type="hidden" th:field="*{idUsuario}">
+                        </div>
+
+                        <div class="d-flex justify-content-between flex-wrap gap-2 mt-4">
+                            <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-1"></i> Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Mi perfil</h1>
+        <p class="text-muted mb-0">
+            Información personal y estado actual de la membresía.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="alert alert-warning d-flex align-items-center" sec:authorize="!isAuthenticated()">
+        <i class="fas fa-lock me-2"></i>
+        Debes iniciar sesión para ver tu perfil.
+        <a class="btn btn-sm btn-outline-dark ms-3" th:href="@{/login}">Iniciar sesión</a>
+    </div>
+
+    <div class="row g-4" sec:authorize="isAuthenticated()">
+        <div class="col-lg-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-secondary text-white d-inline-flex justify-content-center align-items-center mb-3 shadow-sm"
+                         style="width:110px;height:110px;font-size:2rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <h5 class="card-title mb-1"
+                        th:text="${usuarioPerfil != null ? (usuarioPerfil.nombre + ' ' + usuarioPerfil.apellido) : #authentication.name}">
+                        Nombre Apellido
+                    </h5>
+
+                    <small class="text-muted">
+                        Usuario registrado en Warrior Gym
+                    </small>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="fas fa-envelope me-2"></i>
+                        <span th:text="${usuarioPerfil != null ? usuarioPerfil.correo : #authentication.name}">
+                            correo@ejemplo.com
+                        </span>
+                    </li>
+
+                    <li class="list-group-item">
+                        <i class="fas fa-phone me-2"></i>
+                        <span th:text="${usuarioPerfil != null and usuarioPerfil.telefono != null and !#strings.isEmpty(usuarioPerfil.telefono) ? usuarioPerfil.telefono : 'No registrado'}">
+                            No registrado
+                        </span>
+                    </li>
+
+                    <li class="list-group-item">
+                        <i class="fas fa-id-card me-2"></i>
+                        <span th:text="${usuarioPerfil != null and usuarioPerfil.cedula != null and !#strings.isEmpty(usuarioPerfil.cedula) ? usuarioPerfil.cedula : 'No registrada'}">
+                            No registrada
+                        </span>
+                    </li>
+
+                    <li class="list-group-item">
+                        <i class="fas fa-user-shield me-2"></i>
+                        <span class="badge bg-light text-dark"
+                              th:text="${usuarioPerfil != null and usuarioPerfil.rol != null ? usuarioPerfil.rol.nombre : 'SIN ROL'}">
+                            SIN ROL
+                        </span>
+                    </li>
+                </ul>
+
+                <div class="card-body text-center">
+                    <a th:href="@{/perfil/editar}" class="btn btn-warning text-white fw-bold me-2">
+                        <i class="fas fa-user-edit me-1"></i> Editar
+                    </a>
+
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button class="btn btn-danger fw-bold" type="submit">
+                            <i class="fas fa-sign-out-alt me-1"></i> Salir
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 d-flex flex-column gap-4">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Datos de la cuenta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.nombre : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Apellido</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.apellido : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Correo</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.correo : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Teléfono</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.telefono : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Cédula</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.cedula : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Fecha de nacimiento</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null and usuarioPerfil.fechaNacimiento != null ? #temporals.format(usuarioPerfil.fechaNacimiento, 'yyyy-MM-dd') : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Contacto de emergencia</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.contactoEmergencia : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Teléfono de emergencia</label>
+                            <input class="form-control" readonly
+                                   th:value="${usuarioPerfil != null ? usuarioPerfil.telefonoEmergencia : ''}">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Condición médica</label>
+                            <textarea class="form-control" rows="3" readonly
+                                      th:text="${usuarioPerfil != null ? usuarioPerfil.condicionMedica : ''}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Membresía actual</h5>
+                </div>
+                <div class="card-body" th:if="${membresiaActual != null}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tipo de membresía</label>
+                            <input class="form-control" readonly
+                                   th:value="${membresiaActual.tipoMembresia != null ? membresiaActual.tipoMembresia.nombre : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Estado</label>
+                            <input class="form-control" readonly
+                                   th:value="${membresiaActual.estadoMembresia != null ? membresiaActual.estadoMembresia.nombreEstado : ''}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Sucursal</label>
+                            <input class="form-control" readonly
+                                   th:value="${membresiaActual.sucursal != null ? membresiaActual.sucursal.nombre : ''}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Inicio</label>
+                            <input class="form-control" readonly
+                                   th:value="${membresiaActual.fechaInicio != null ? #temporals.format(membresiaActual.fechaInicio, 'yyyy-MM-dd') : ''}">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Vencimiento</label>
+                            <input class="form-control" readonly
+                                   th:value="${membresiaActual.fechaVencimiento != null ? #temporals.format(membresiaActual.fechaVencimiento, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body" th:if="${membresiaActual == null}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay una membresía registrada para este usuario.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

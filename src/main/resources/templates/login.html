@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h2 class="m-0">Inicio de sesión</h2>
+                </div>
+
+                <div class="card-body">
+                    <div th:if="${param.error}" class="alert alert-danger mb-4">
+                        Credenciales inválidas. Verifica tu correo y contraseña.
+                    </div>
+
+                    <div th:if="${param.logout}" class="alert alert-info mb-4">
+                        Sesión cerrada correctamente.
+                    </div>
+
+                    <form method="post" th:action="@{/login}">
+                        <div class="mb-3">
+                            <label for="correo" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-1"></i> Correo electrónico
+                            </label>
+                            <input id="correo"
+                                   name="email"
+                                   type="email"
+                                   class="form-control"
+                                   placeholder="correo@ejemplo.com"
+                                   required
+                                   autofocus>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="contrasenia" class="form-label fw-semibold">
+                                <i class="fas fa-key me-1"></i> Contraseña
+                            </label>
+                            <input id="contrasenia"
+                                   name="password"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="Ingresa tu contraseña"
+                                   required>
+                        </div>
+
+                        <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <a th:href="@{/forgot-password}" class="btn btn-outline-secondary">
+                                <i class="fas fa-envelope me-1"></i> Olvidé mi contraseña
+                            </a>
+
+                            <button class="btn btn-warning text-white" type="submit">
+                                <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container text-center">
+        <h1 class="display-6 fw-bold mb-2">Sobre nosotros</h1>
+        <p class="text-muted mb-0">
+            Warrior Gym como solución tecnológica para la gestión de membresías y acceso.
+        </p>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Nuestra propuesta</h4>
+                    <p>
+                        Warrior Gym nace como un proyecto enfocado en mejorar la administración
+                        de un gimnasio por medio de una base de datos Oracle y una aplicación web
+                        desarrollada con Spring Boot y Thymeleaf.
+                    </p>
+                    <p class="mb-0">
+                        El objetivo principal es centralizar la información de usuarios, membresías
+                        y operación administrativa para reducir errores y facilitar la consulta de datos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Qué resuelve el sistema</h4>
+                    <ul class="mb-0">
+                        <li>Gestión centralizada de usuarios y roles.</li>
+                        <li>Administración de tipos de membresía y membresías activas.</li>
+                        <li>Consulta de información desde una interfaz web clara.</li>
+                        <li>Base técnica para reportes, pagos y control de acceso.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
