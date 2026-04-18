@@ -1,6 +1,7 @@
-com\gym\controller\UsuarioController.class
+com\gym\controller\AdminEmpleadoController.class
 com\gym\domain\Rol.class
 com\gym\Repository\BitacoraAccesoRepository.class
+com\gym\controller\AdminSucursalController.class
 com\gym\GimnasioApplication.class
 com\gym\controller\AuthController.class
 com\gym\service\MembresiaServiceImpl.class
@@ -8,11 +9,14 @@ com\gym\config\ThymeleafConfig.class
 com\gym\domain\Membresia.class
 com\gym\domain\EstadoMembresia.class
 com\gym\service\UsuarioServiceImpl.class
-com\gym\controller\MembresiaController.class
+com\gym\controller\AdminRolController.class
+com\gym\controller\AdminUsuarioController.class
+com\gym\controller\AdminCajaController.class
 com\gym\service\UsuarioService.class
 com\gym\Repository\TipoMembresiaRepository.class
 com\gym\config\SecurityConfig.class
 com\gym\domain\TipoMembresia.class
+com\gym\controller\AdminTipoMembresiaController.class
 com\gym\controller\AdminController.class
 com\gym\config\PasswordMigrationConfig.class
 com\gym\domain\MetodoPago.class
@@ -36,6 +40,7 @@ com\gym\Repository\RolRepository.class
 com\gym\controller\PersonalController.class
 com\gym\domain\Empleado.class
 com\gym\controller\PerfilController.class
+com\gym\controller\AdminMembresiaController.class
 com\gym\Repository\EmpleadoRepository.class
 com\gym\Repository\MetodoPagoRepository.class
 com\gym\service\CustomUserDetailsService.class

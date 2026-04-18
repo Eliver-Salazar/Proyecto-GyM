@@ -57,12 +57,8 @@ public class PerfilController {
         Usuario usuario = usuarioOpt.get();
         model.addAttribute("usuarioPerfil", usuario);
 
-        List<Membresia> membresias = membresiaRepository.findByUsuario(usuario);
-        Membresia membresiaActual = membresias.stream()
-                .max(Comparator.comparing(
-                        Membresia::getFechaVencimiento,
-                        Comparator.nullsLast(Comparator.naturalOrder())
-                ))
+        Membresia membresiaActual = membresiaRepository
+                .findByUsuarioIdUsuario(usuario.getIdUsuario())
                 .orElse(null);
 
         List<Pago> pagosRecientes = pagoRepository.findByUsuarioIdUsuario(usuario.getIdUsuario()).stream()

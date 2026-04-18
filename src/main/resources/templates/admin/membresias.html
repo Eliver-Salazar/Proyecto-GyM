@@ -2,122 +2,210 @@
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{layout/plantilla :: head}"></head>
+    <head th:replace="~{layout/plantilla :: head}"></head>
 
-<body>
-<header th:replace="~{layout/plantilla :: header}"></header>
+    <body>
+        <header th:replace="~{layout/plantilla :: header}"></header>
 
-<section class="py-5 bg-light border-bottom">
-    <div class="container">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <div>
-                <h1 class="display-6 fw-bold mb-2">Gestión de membresías</h1>
-                <p class="text-muted mb-0">
-                    Consulta de tipos de membresía y membresías registradas en el sistema.
-                </p>
+        <section class="py-5 bg-light border-bottom">
+            <div class="container">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <div>
+                        <h1 class="display-6 fw-bold mb-2">Membresías</h1>
+                        <p class="text-muted mb-0">
+                            Administración de membresías asignadas a clientes del gimnasio.
+                        </p>
+                    </div>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al panel
+                    </a>
+                </div>
             </div>
-            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Volver al panel
-            </a>
-        </div>
-    </div>
-</section>
+        </section>
 
-<main class="container py-5">
-    <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h4 class="mb-0">Tipos de membresía disponibles</h4>
-        </div>
-
-        <div class="card-body" th:if="${tiposMembresia != null and !#lists.isEmpty(tiposMembresia)}">
+        <main class="container py-5">
             <div class="row g-4">
-                <div class="col-md-6 col-xl-4" th:each="tipo : ${tiposMembresia}">
-                    <div class="card h-100 border-0 shadow-sm">
+                <div class="col-lg-5">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-warning text-dark">
+                            <h4 class="mb-0"
+                                th:text="${modoEdicionMembresia ? 'Editar membresía' : 'Registrar membresía'}">
+                                Registrar membresía
+                            </h4>
+                        </div>
+
                         <div class="card-body">
-                            <h5 class="card-title fw-bold" th:text="${tipo.nombre}">Premium</h5>
-                            <p class="text-muted mb-2">
-                                Duración:
-                                <span th:text="${tipo.cantidadDias}">30</span>
-                                días
-                            </p>
-                            <p class="mb-2">
-                                Precio:
-                                ₡ <span th:text="${tipo.precio}">0</span>
-                            </p>
-                            <p class="mb-0">
-                                Acceso global:
-                                <span th:text="${tipo.accesoGlobal != null ? tipo.accesoGlobal : 'No definido'}">Sí</span>
-                            </p>
+                            <form th:action="@{/admin/membresias/guardar}" th:object="${membresiaForm}" method="post">
+                                <input type="hidden" th:field="*{idMembresia}"/>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Cliente</label>
+                                    <select class="form-select" th:field="*{usuario.idUsuario}" required>
+                                        <option value=""
+                                                th:text="${#lists.isEmpty(usuariosDisponibles) ? 'No hay clientes disponibles para registrar' : 'Seleccione un cliente'}">
+                                            Seleccione un cliente
+                                        </option>
+                                        <option th:each="u : ${usuariosDisponibles}"
+                                                th:value="${u.idUsuario}"
+                                                th:text="${u.nombre + ' ' + u.apellido + ' - ' + u.correo}">
+                                            Cliente
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        Solo se muestran clientes que todavía no tienen una membresía registrada.
+                                        Si un cliente ya tiene membresía, debes editar la existente.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Tipo de membresía</label>
+                                    <select class="form-select" th:field="*{tipoMembresia.idTipoMembresia}" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option th:each="t : ${tiposDisponibles}"
+                                                th:value="${t.idTipoMembresia}"
+                                                th:text="${t.nombre + ' - ' + t.cantidadDias + ' días'}">
+                                            Tipo
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Estado</label>
+                                    <select class="form-select" th:field="*{estadoMembresia.idEstadoMembresia}" required>
+                                        <option value="">Seleccione un estado</option>
+                                        <option th:each="e : ${estadosDisponibles}"
+                                                th:value="${e.idEstadoMembresia}"
+                                                th:text="${e.nombreEstado}">
+                                            Estado
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Sucursal</label>
+                                    <select class="form-select" th:field="*{sucursal.idSucursal}" required>
+                                        <option value="">Seleccione una sucursal</option>
+                                        <option th:each="s : ${sucursalesDisponibles}"
+                                                th:value="${s.idSucursal}"
+                                                th:text="${s.nombre}">
+                                            Sucursal
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha de inicio</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           th:field="*{fechaInicio}"
+                                           required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha de vencimiento</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           th:field="*{fechaVencimiento}"
+                                           required>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-warning text-white">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span th:text="${modoEdicionMembresia ? 'Actualizar membresía' : 'Guardar membresía'}">
+                                            Guardar membresía
+                                        </span>
+                                    </button>
+
+                                    <a th:if="${modoEdicionMembresia}"
+                                       th:href="@{/admin/membresias}"
+                                       class="btn btn-outline-secondary">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="mb-0">Membresías registradas</h4>
+                        </div>
+
+                        <div class="card-body p-0"
+                             th:if="${membresiasListado != null and !#lists.isEmpty(membresiasListado)}">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Cliente</th>
+                                            <th>Tipo</th>
+                                            <th>Estado</th>
+                                            <th>Sucursal</th>
+                                            <th>Vigencia</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="m : ${membresiasListado}">
+                                            <td th:text="${m.idMembresia}">1</td>
+                                            <td th:text="${m.usuario != null ? (m.usuario.nombre + ' ' + m.usuario.apellido) : 'Sin cliente'}">
+                                                Cliente
+                                            </td>
+                                            <td th:text="${m.tipoMembresia != null ? m.tipoMembresia.nombre : 'Sin tipo'}">
+                                                Tipo
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary fs-6"
+                                                      th:text="${m.estadoMembresia != null ? m.estadoMembresia.nombreEstado : 'Sin estado'}">
+                                                    ESTADO
+                                                </span>
+                                            </td>
+                                            <td th:text="${m.sucursal != null ? m.sucursal.nombre : 'Sin sucursal'}">
+                                                Sucursal
+                                            </td>
+                                            <td th:text="${(m.fechaInicio != null ? #dates.format(m.fechaInicio, 'dd/MM/yyyy') : '—') + ' - ' + (m.fechaVencimiento != null ? #dates.format(m.fechaVencimiento, 'dd/MM/yyyy') : '—')}">
+                                                01/01/2026 - 31/01/2026
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a th:href="@{/admin/membresias/editar/{id}(id=${m.idMembresia})}"
+                                                       class="btn btn-sm btn-outline-primary"
+                                                       title="Editar">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+
+                                                    <form th:action="@{/admin/membresias/eliminar/{id}(id=${m.idMembresia})}"
+                                                          method="post"
+                                                          onsubmit="return confirm('¿Deseas eliminar esta membresía?');">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-body"
+                             th:if="${membresiasListado == null or #lists.isEmpty(membresiasListado)}">
+                            <div class="alert alert-secondary mb-0">
+                                No hay membresías registradas todavía.
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <div class="card-body" th:if="${tiposMembresia == null or #lists.isEmpty(tiposMembresia)}">
-            <div class="alert alert-secondary mb-0">
-                No hay tipos de membresía registrados todavía.
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white">
-            <h4 class="mb-0">Membresías registradas</h4>
-        </div>
-
-        <div class="card-body" th:if="${membresias != null and !#lists.isEmpty(membresias)}">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Sucursal</th>
-                        <th>Inicio</th>
-                        <th>Vencimiento</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="m : ${membresias}">
-                        <td th:text="${m.idMembresia}">1</td>
-                        <td th:text="${m.usuario != null ? ((m.usuario.nombre != null ? m.usuario.nombre : '') + ' ' + (m.usuario.apellido != null ? m.usuario.apellido : '')) : 'Sin usuario'}">
-                            Usuario
-                        </td>
-                        <td th:text="${m.tipoMembresia != null ? m.tipoMembresia.nombre : 'Sin tipo'}">
-                            Tipo
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary"
-                                  th:text="${m.estadoMembresia != null ? m.estadoMembresia.nombreEstado : 'Sin estado'}">
-                                Estado
-                            </span>
-                        </td>
-                        <td th:text="${m.sucursal != null ? m.sucursal.nombre : 'Sin sucursal'}">
-                            Sucursal
-                        </td>
-                        <td th:text="${m.fechaInicio != null ? #dates.format(m.fechaInicio, 'yyyy-MM-dd') : ''}">
-                            2026-01-01
-                        </td>
-                        <td th:text="${m.fechaVencimiento != null ? #dates.format(m.fechaVencimiento, 'yyyy-MM-dd') : ''}">
-                            2026-01-31
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card-body" th:if="${membresias == null or #lists.isEmpty(membresias)}">
-            <div class="alert alert-secondary mb-0">
-                No hay membresías registradas todavía.
-            </div>
-        </div>
-    </div>
-</main>
-
-<footer th:replace="~{layout/plantilla :: footer}"></footer>
-</body>
+        <footer th:replace="~{layout/plantilla :: footer}"></footer>
+    </body>
 </html>

@@ -87,13 +87,6 @@ public class AdminController {
         return "admin/index";
     }
 
-    @GetMapping("/admin/membresias")
-    public String membresias(Model model) {
-        model.addAttribute("membresias", membresiaRepository.findAll());
-        model.addAttribute("tiposMembresia", tipoMembresiaRepository.findAll());
-        return "admin/membresias";
-    }
-
     @GetMapping("/admin/reportes")
     public String reportes(Model model) {
         model.addAttribute("usuarios", usuarioRepository.findAll());
