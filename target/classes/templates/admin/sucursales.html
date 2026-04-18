@@ -1,15 +1,165 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">Sucursales</h1>
+                <p class="text-muted mb-0">
+                    Administración de las sedes del gimnasio registradas en el sistema.
+                </p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicionSucursal ? 'Editar sucursal' : 'Registrar sucursal'}">
+                        Registrar sucursal
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/admin/sucursales/guardar}" th:object="${sucursalForm}" method="post">
+                        <input type="hidden" th:field="*{idSucursal}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{nombre}"
+                                   required
+                                   maxlength="80"
+                                   pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+"
+                                   title="Solo se permiten letras, números y espacios."
+                                   placeholder="CARTAGO CENTRO">
+                            <div class="form-text">
+                                Solo letras, números y espacios.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Dirección</label>
+                            <textarea class="form-control"
+                                      th:field="*{direccion}"
+                                      required
+                                      maxlength="200"
+                                      rows="3"
+                                      placeholder="200 metros al norte del parque central"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Teléfono</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{telefono}"
+                                   maxlength="20"
+                                   inputmode="numeric"
+                                   pattern="[0-9]{8}"
+                                   title="Debe contener exactamente 8 dígitos."
+                                   placeholder="88887777">
+                            <div class="form-text">
+                                Opcional. Si se ingresa, debe tener exactamente 8 dígitos.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicionSucursal ? 'Actualizar sucursal' : 'Guardar sucursal'}">
+                                    Guardar sucursal
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicionSucursal}"
+                               th:href="@{/admin/sucursales}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Sucursales registradas</h4>
+                </div>
+
+                <div class="card-body p-0"
+                     th:if="${sucursalesListado != null and !#lists.isEmpty(sucursalesListado)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${sucursalesListado}">
+                                <td th:text="${s.idSucursal}">1</td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6" th:text="${s.nombre}">CARTAGO CENTRO</span>
+                                </td>
+                                <td th:text="${s.direccion}">Dirección</td>
+                                <td th:text="${s.telefono != null and !#strings.isEmpty(s.telefono) ? s.telefono : '—'}">
+                                    88887777
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/sucursales/editar/{id}(id=${s.idSucursal})}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/sucursales/eliminar/{id}(id=${s.idSucursal})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar esta sucursal?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body"
+                     th:if="${sucursalesListado == null or #lists.isEmpty(sucursalesListado)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay sucursales registradas todavía.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
 </html>
