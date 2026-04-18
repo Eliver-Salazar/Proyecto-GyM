@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">Catálogo de roles</h1>
+                <p class="text-muted mb-0">
+                    Administración de los roles que utiliza el sistema para usuarios y permisos.
+                </p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicionRol ? 'Editar rol' : 'Registrar rol'}">
+                        Registrar rol
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/admin/roles/guardar}" th:object="${rolForm}" method="post">
+                        <input type="hidden" th:field="*{idRol}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nombre del rol</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{nombre}"
+                                   required
+                                   maxlength="50"
+                                   placeholder="ADMIN">
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicionRol ? 'Actualizar rol' : 'Guardar rol'}">
+                                    Guardar rol
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicionRol}" th:href="@{/admin/roles}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Roles registrados</h4>
+                </div>
+
+                <div class="card-body p-0" th:if="${rolesListado != null and !#lists.isEmpty(rolesListado)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${rolesListado}">
+                                <td th:text="${r.idRol}">1</td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6" th:text="${r.nombre}">ADMIN</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/roles/editar/{id}(id=${r.idRol})}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/roles/eliminar/{id}(id=${r.idRol})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar este rol?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body" th:if="${rolesListado == null or #lists.isEmpty(rolesListado)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay roles registrados todavía.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -8,8 +8,10 @@ import com.gym.Repository.TipoMembresiaRepository;
 import com.gym.Repository.UsuarioRepository;
 import com.gym.domain.Membresia;
 import com.gym.domain.Rol;
+import com.gym.domain.TipoMembresia;
 import com.gym.domain.Usuario;
 import com.gym.service.UsuarioService;
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +73,7 @@ public class AdminController {
         long totalTipos = tipoMembresiaRepository.count();
         long totalPagos = pagoRepository.count();
         long totalSucursales = sucursalRepository.count();
+        long totalRoles = rolRepository.count();
 
         List<Usuario> usuariosRecientes = usuarios.stream()
                 .sorted(Comparator.comparing(Usuario::getIdUsuario, Comparator.nullsLast(Long::compareTo)).reversed())
@@ -90,6 +93,7 @@ public class AdminController {
         model.addAttribute("totalTipos", totalTipos);
         model.addAttribute("totalPagos", totalPagos);
         model.addAttribute("totalSucursales", totalSucursales);
+        model.addAttribute("totalRoles", totalRoles);
         model.addAttribute("usuariosRecientes", usuariosRecientes);
         model.addAttribute("membresiasRecientes", membresiasRecientes);
 
@@ -253,6 +257,248 @@ public class AdminController {
         return "redirect:/admin/usuarios";
     }
 
+    @GetMapping("/admin/roles")
+    public String roles(Model model) {
+        prepararVistaRoles(model, new Rol(), false);
+        return "admin/roles";
+    }
+
+    @GetMapping("/admin/roles/editar/{id}")
+    public String editarRol(@PathVariable("id") Long id,
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
+
+        Optional<Rol> rolOpt = rolRepository.findById(id);
+
+        if (rolOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "El rol solicitado no existe.");
+            return "redirect:/admin/roles";
+        }
+
+        prepararVistaRoles(model, rolOpt.get(), true);
+        return "admin/roles";
+    }
+
+    @PostMapping("/admin/roles/guardar")
+    public String guardarRol(@ModelAttribute("rolForm") Rol rolForm,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
+
+        if (rolForm.getNombre() == null || rolForm.getNombre().isBlank()) {
+            model.addAttribute("error", "El nombre del rol es obligatorio.");
+            prepararVistaRoles(model, rolForm, rolForm.getIdRol() != null);
+            return "admin/roles";
+        }
+
+        String nombreNormalizado = rolForm.getNombre().trim().toUpperCase();
+
+        Optional<Rol> rolExistenteNombre = rolRepository.findByNombre(nombreNormalizado);
+
+        if (rolExistenteNombre.isPresent()
+                && (rolForm.getIdRol() == null || !rolExistenteNombre.get().getIdRol().equals(rolForm.getIdRol()))) {
+            model.addAttribute("error", "Ya existe un rol registrado con ese nombre.");
+            rolForm.setNombre(nombreNormalizado);
+            prepararVistaRoles(model, rolForm, rolForm.getIdRol() != null);
+            return "admin/roles";
+        }
+
+        boolean esEdicion = rolForm.getIdRol() != null;
+        Rol rolGuardar;
+
+        if (esEdicion) {
+            Optional<Rol> rolOpt = rolRepository.findById(rolForm.getIdRol());
+            if (rolOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "No se encontró el rol a editar.");
+                return "redirect:/admin/roles";
+            }
+            rolGuardar = rolOpt.get();
+        } else {
+            rolGuardar = new Rol();
+        }
+
+        rolGuardar.setNombre(nombreNormalizado);
+
+        try {
+            rolRepository.save(rolGuardar);
+        } catch (DataIntegrityViolationException ex) {
+            model.addAttribute("error", "No se pudo guardar el rol porque ya existe o viola una restricción.");
+            prepararVistaRoles(model, rolForm, esEdicion);
+            return "admin/roles";
+        } catch (Exception ex) {
+            model.addAttribute("error", "Ocurrió un error inesperado al guardar el rol.");
+            prepararVistaRoles(model, rolForm, esEdicion);
+            return "admin/roles";
+        }
+
+        redirectAttributes.addFlashAttribute("mensaje",
+                esEdicion ? "Rol actualizado correctamente." : "Rol creado correctamente.");
+
+        return "redirect:/admin/roles";
+    }
+
+    @PostMapping("/admin/roles/eliminar/{id}")
+    public String eliminarRol(@PathVariable("id") Long id,
+                              RedirectAttributes redirectAttributes) {
+
+        Optional<Rol> rolOpt = rolRepository.findById(id);
+
+        if (rolOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "El rol no existe.");
+            return "redirect:/admin/roles";
+        }
+
+        try {
+            rolRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Rol eliminado correctamente.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error",
+                    "No se pudo eliminar el rol porque está siendo utilizado por uno o más usuarios.");
+        }
+
+        return "redirect:/admin/roles";
+    }
+
+    @GetMapping("/admin/tipos-membresia")
+    public String tiposMembresia(Model model) {
+        prepararVistaTiposMembresia(model, new TipoMembresia(), false);
+        return "admin/tipos-membresia";
+    }
+
+    @GetMapping("/admin/tipos-membresia/editar/{id}")
+    public String editarTipoMembresia(@PathVariable("id") Long id,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+
+        Optional<TipoMembresia> tipoOpt = tipoMembresiaRepository.findById(id);
+
+        if (tipoOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "El tipo de membresía solicitado no existe.");
+            return "redirect:/admin/tipos-membresia";
+        }
+
+        prepararVistaTiposMembresia(model, tipoOpt.get(), true);
+        return "admin/tipos-membresia";
+    }
+
+    @PostMapping("/admin/tipos-membresia/guardar")
+    public String guardarTipoMembresia(@ModelAttribute("tipoForm") TipoMembresia tipoForm,
+                                       Model model,
+                                       RedirectAttributes redirectAttributes) {
+
+        if (tipoForm.getNombre() == null || tipoForm.getNombre().isBlank()
+                || tipoForm.getCantidadDias() == null
+                || tipoForm.getPrecio() == null
+                || tipoForm.getAccesoGlobal() == null || tipoForm.getAccesoGlobal().isBlank()) {
+
+            model.addAttribute("error",
+                    "Debes completar nombre, cantidad de días, precio y acceso global.");
+            prepararVistaTiposMembresia(model, tipoForm, tipoForm.getIdTipoMembresia() != null);
+            return "admin/tipos-membresia";
+        }
+
+        String nombreNormalizado = tipoForm.getNombre().trim().toUpperCase();
+        String accesoGlobalNormalizado = tipoForm.getAccesoGlobal().trim().toUpperCase();
+
+        if (tipoForm.getCantidadDias() <= 0) {
+            model.addAttribute("error", "La cantidad de días debe ser mayor que cero.");
+            tipoForm.setNombre(nombreNormalizado);
+            tipoForm.setAccesoGlobal(accesoGlobalNormalizado);
+            prepararVistaTiposMembresia(model, tipoForm, tipoForm.getIdTipoMembresia() != null);
+            return "admin/tipos-membresia";
+        }
+
+        if (tipoForm.getPrecio().compareTo(BigDecimal.ZERO) < 0) {
+            model.addAttribute("error", "El precio no puede ser negativo.");
+            tipoForm.setNombre(nombreNormalizado);
+            tipoForm.setAccesoGlobal(accesoGlobalNormalizado);
+            prepararVistaTiposMembresia(model, tipoForm, tipoForm.getIdTipoMembresia() != null);
+            return "admin/tipos-membresia";
+        }
+
+        if (!accesoGlobalNormalizado.equals("S") && !accesoGlobalNormalizado.equals("N")) {
+            model.addAttribute("error", "El acceso global debe ser 'S' o 'N'.");
+            tipoForm.setNombre(nombreNormalizado);
+            tipoForm.setAccesoGlobal(accesoGlobalNormalizado);
+            prepararVistaTiposMembresia(model, tipoForm, tipoForm.getIdTipoMembresia() != null);
+            return "admin/tipos-membresia";
+        }
+
+        List<TipoMembresia> existentes = tipoMembresiaRepository.findAll();
+        boolean nombreDuplicado = existentes.stream()
+                .anyMatch(t -> t.getNombre() != null
+                        && t.getNombre().equalsIgnoreCase(nombreNormalizado)
+                        && (tipoForm.getIdTipoMembresia() == null
+                        || !t.getIdTipoMembresia().equals(tipoForm.getIdTipoMembresia())));
+
+        if (nombreDuplicado) {
+            model.addAttribute("error", "Ya existe un tipo de membresía registrado con ese nombre.");
+            tipoForm.setNombre(nombreNormalizado);
+            tipoForm.setAccesoGlobal(accesoGlobalNormalizado);
+            prepararVistaTiposMembresia(model, tipoForm, tipoForm.getIdTipoMembresia() != null);
+            return "admin/tipos-membresia";
+        }
+
+        boolean esEdicion = tipoForm.getIdTipoMembresia() != null;
+        TipoMembresia tipoGuardar;
+
+        if (esEdicion) {
+            Optional<TipoMembresia> tipoOpt = tipoMembresiaRepository.findById(tipoForm.getIdTipoMembresia());
+            if (tipoOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "No se encontró el tipo de membresía a editar.");
+                return "redirect:/admin/tipos-membresia";
+            }
+            tipoGuardar = tipoOpt.get();
+        } else {
+            tipoGuardar = new TipoMembresia();
+        }
+
+        tipoGuardar.setNombre(nombreNormalizado);
+        tipoGuardar.setCantidadDias(tipoForm.getCantidadDias());
+        tipoGuardar.setPrecio(tipoForm.getPrecio());
+        tipoGuardar.setAccesoGlobal(accesoGlobalNormalizado);
+
+        try {
+            tipoMembresiaRepository.save(tipoGuardar);
+        } catch (DataIntegrityViolationException ex) {
+            model.addAttribute("error",
+                    "No se pudo guardar el tipo de membresía porque ya existe o viola una restricción.");
+            prepararVistaTiposMembresia(model, tipoForm, esEdicion);
+            return "admin/tipos-membresia";
+        } catch (Exception ex) {
+            model.addAttribute("error", "Ocurrió un error inesperado al guardar el tipo de membresía.");
+            prepararVistaTiposMembresia(model, tipoForm, esEdicion);
+            return "admin/tipos-membresia";
+        }
+
+        redirectAttributes.addFlashAttribute("mensaje",
+                esEdicion ? "Tipo de membresía actualizado correctamente."
+                          : "Tipo de membresía creado correctamente.");
+
+        return "redirect:/admin/tipos-membresia";
+    }
+
+    @PostMapping("/admin/tipos-membresia/eliminar/{id}")
+    public String eliminarTipoMembresia(@PathVariable("id") Long id,
+                                        RedirectAttributes redirectAttributes) {
+
+        Optional<TipoMembresia> tipoOpt = tipoMembresiaRepository.findById(id);
+
+        if (tipoOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "El tipo de membresía no existe.");
+            return "redirect:/admin/tipos-membresia";
+        }
+
+        try {
+            tipoMembresiaRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Tipo de membresía eliminado correctamente.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error",
+                    "No se pudo eliminar el tipo de membresía porque está siendo utilizado por una o más membresías.");
+        }
+
+        return "redirect:/admin/tipos-membresia";
+    }
+
     @GetMapping("/admin/membresias")
     public String membresias(Model model) {
         model.addAttribute("membresias", membresiaRepository.findAll());
@@ -277,6 +523,22 @@ public class AdminController {
                 .toList());
         model.addAttribute("usuarioForm", usuarioForm);
         model.addAttribute("modoEdicion", modoEdicion);
+    }
+
+    private void prepararVistaRoles(Model model, Rol rolForm, boolean modoEdicion) {
+        model.addAttribute("rolesListado", rolRepository.findAll().stream()
+                .sorted(Comparator.comparing(Rol::getNombre, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .toList());
+        model.addAttribute("rolForm", rolForm);
+        model.addAttribute("modoEdicionRol", modoEdicion);
+    }
+
+    private void prepararVistaTiposMembresia(Model model, TipoMembresia tipoForm, boolean modoEdicion) {
+        model.addAttribute("tiposListado", tipoMembresiaRepository.findAll().stream()
+                .sorted(Comparator.comparing(TipoMembresia::getNombre, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .toList());
+        model.addAttribute("tipoForm", tipoForm);
+        model.addAttribute("modoEdicionTipo", modoEdicion);
     }
 
     private String limpiarTelefono(String telefono) {

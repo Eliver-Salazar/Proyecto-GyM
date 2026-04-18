@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">Tipos de membresía</h1>
+                <p class="text-muted mb-0">
+                    Administración del catálogo de planes disponibles para el gimnasio.
+                </p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicionTipo ? 'Editar tipo de membresía' : 'Registrar tipo de membresía'}">
+                        Registrar tipo de membresía
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/admin/tipos-membresia/guardar}" th:object="${tipoForm}" method="post">
+                        <input type="hidden" th:field="*{idTipoMembresia}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{nombre}"
+                                   required
+                                   maxlength="50"
+                                   placeholder="PREMIUM">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Cantidad de días</label>
+                            <input type="number"
+                                   class="form-control"
+                                   th:field="*{cantidadDias}"
+                                   required
+                                   min="1"
+                                   step="1"
+                                   placeholder="30">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Precio</label>
+                            <input type="number"
+                                   class="form-control"
+                                   th:field="*{precio}"
+                                   required
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="25000.00">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Acceso global</label>
+                            <select class="form-select" th:field="*{accesoGlobal}" required>
+                                <option value="">Seleccione una opción</option>
+                                <option value="S">Sí</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicionTipo ? 'Actualizar tipo' : 'Guardar tipo'}">
+                                    Guardar tipo
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicionTipo}" th:href="@{/admin/tipos-membresia}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Tipos registrados</h4>
+                </div>
+
+                <div class="card-body p-0" th:if="${tiposListado != null and !#lists.isEmpty(tiposListado)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Días</th>
+                                <th>Precio</th>
+                                <th>Acceso global</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="t : ${tiposListado}">
+                                <td th:text="${t.idTipoMembresia}">1</td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6" th:text="${t.nombre}">PREMIUM</span>
+                                </td>
+                                <td th:text="${t.cantidadDias}">30</td>
+                                <td th:text="${'₡ ' + #numbers.formatDecimal(t.precio, 1, 'COMMA', 2, 'POINT')}">
+                                    ₡ 0.00
+                                </td>
+                                <td th:text="${t.accesoGlobal != null and t.accesoGlobal == 'S' ? 'Sí' : 'No'}">Sí</td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/tipos-membresia/editar/{id}(id=${t.idTipoMembresia})}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/tipos-membresia/eliminar/{id}(id=${t.idTipoMembresia})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar este tipo de membresía?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body" th:if="${tiposListado == null or #lists.isEmpty(tiposListado)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay tipos de membresía registrados todavía.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
