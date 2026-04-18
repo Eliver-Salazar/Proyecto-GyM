@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">Empleados</h1>
+                <p class="text-muted mb-0">
+                    Administración del personal del gimnasio y su asignación por sucursal.
+                </p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicionEmpleado ? 'Editar empleado' : 'Registrar empleado'}">
+                        Registrar empleado
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/admin/empleados/guardar}" th:object="${empleadoForm}" method="post">
+                        <input type="hidden" th:field="*{idEmpleado}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Usuario (rol PERSONAL)</label>
+                            <select class="form-select" th:field="*{usuario.idUsuario}" required>
+                                <option value="">Seleccione un usuario</option>
+                                <option th:each="u : ${usuariosDisponibles}"
+                                        th:value="${u.idUsuario}"
+                                        th:text="${u.nombre + ' ' + u.apellido + ' - ' + u.correo}">
+                                    Usuario
+                                </option>
+                            </select>
+                            <div class="form-text">
+                                Solo se muestran usuarios con rol PERSONAL que no estén asignados a otro empleado.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Sucursal</label>
+                            <select class="form-select" th:field="*{sucursal.idSucursal}" required>
+                                <option value="">Seleccione una sucursal</option>
+                                <option th:each="s : ${sucursalesDisponibles}"
+                                        th:value="${s.idSucursal}"
+                                        th:text="${s.nombre}">
+                                    Sucursal
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Puesto</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{puesto}"
+                                   required
+                                   maxlength="60"
+                                   pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                                   title="Solo se permiten letras y espacios."
+                                   placeholder="ENTRENADOR">
+                            <div class="form-text">
+                                Solo letras y espacios. Ejemplos: ENTRENADOR, RECEPCIONISTA, ADMINISTRADOR.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Fecha de contratación</label>
+                            <input type="date"
+                                   class="form-control"
+                                   th:field="*{fechaContratacion}"
+                                   required>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicionEmpleado ? 'Actualizar empleado' : 'Guardar empleado'}">
+                                    Guardar empleado
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicionEmpleado}"
+                               th:href="@{/admin/empleados}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Empleados registrados</h4>
+                </div>
+
+                <div class="card-body p-0"
+                     th:if="${empleadosListado != null and !#lists.isEmpty(empleadosListado)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Sucursal</th>
+                                <th>Puesto</th>
+                                <th>Fecha contratación</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="e : ${empleadosListado}">
+                                <td th:text="${e.idEmpleado}">1</td>
+                                <td th:text="${e.usuario != null ? (e.usuario.nombre + ' ' + e.usuario.apellido) : 'Sin usuario'}">
+                                    Usuario
+                                </td>
+                                <td th:text="${e.sucursal != null ? e.sucursal.nombre : 'Sin sucursal'}">
+                                    Sucursal
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6"
+                                          th:text="${e.puesto}">
+                                        ENTRENADOR
+                                    </span>
+                                </td>
+                                <td th:text="${e.fechaContratacion != null ? #dates.format(e.fechaContratacion, 'dd/MM/yyyy') : '—'}">
+                                    01/01/2026
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/empleados/editar/{id}(id=${e.idEmpleado})}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/empleados/eliminar/{id}(id=${e.idEmpleado})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar este empleado?');">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body"
+                     th:if="${empleadosListado == null or #lists.isEmpty(empleadosListado)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay empleados registrados todavía.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
