@@ -11,7 +11,7 @@ public class EstadoMembresia implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ESTADO_MEMBRESIA")
     private Long idEstadoMembresia;
-
+    
     @Column(name = "NOMBRE_ESTADO", nullable = false, length = 30, unique = true)
     private String nombreEstado;
 

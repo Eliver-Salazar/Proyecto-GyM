@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/plantilla :: head}"></head>
+
+    <body>
+        <header th:replace="~{layout/plantilla :: header}"></header>
+
+        <section class="py-5 bg-light border-bottom">
+            <div class="container">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <div>
+                        <h1 class="display-6 fw-bold mb-2">Estados de membresía</h1>
+                        <p class="text-muted mb-0">
+                            Administración del catálogo de estados utilizados por el módulo de membresías.
+                        </p>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/admin/membresias}" class="btn btn-outline-warning">
+                            <i class="fas fa-id-card me-2"></i>Ir a membresías
+                        </a>
+                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al panel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-warning text-dark">
+                            <h4 class="mb-0"
+                                th:text="${modoEdicionEstado ? 'Editar estado de membresía' : 'Registrar estado de membresía'}">
+                                Registrar estado de membresía
+                            </h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form th:action="@{/admin/estados-membresia/guardar}"
+                                  th:object="${estadoForm}"
+                                  method="post">
+
+                                <input type="hidden" th:field="*{idEstadoMembresia}"/>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Nombre del estado</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           th:field="*{nombreEstado}"
+                                           required
+                                           maxlength="30"
+                                           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+                                           title="Solo se permiten letras y espacios."
+                                           placeholder="ACTIVA">
+                                    <div class="form-text">
+                                        Solo letras y espacios. Ejemplos: ACTIVA, VENCIDA, SUSPENDIDA, EN PAUSA.
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-warning text-white">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span th:text="${modoEdicionEstado ? 'Actualizar estado' : 'Guardar estado'}">
+                                            Guardar estado
+                                        </span>
+                                    </button>
+
+                                    <a th:if="${modoEdicionEstado}"
+                                       th:href="@{/admin/estados-membresia}"
+                                       class="btn btn-outline-secondary">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="mb-0">Estados registrados</h4>
+                        </div>
+
+                        <div class="card-body p-0"
+                             th:if="${estadosListado != null and !#lists.isEmpty(estadosListado)}">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre del estado</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="e : ${estadosListado}">
+                                            <td th:text="${e.idEstadoMembresia}">1</td>
+                                            <td>
+                                                <span class="badge bg-secondary fs-6"
+                                                      th:text="${e.nombreEstado}">
+                                                    ACTIVA
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a th:href="@{/admin/estados-membresia/editar/{id}(id=${e.idEstadoMembresia})}"
+                                                       class="btn btn-sm btn-outline-primary"
+                                                       title="Editar">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+
+                                                    <form th:action="@{/admin/estados-membresia/eliminar/{id}(id=${e.idEstadoMembresia})}"
+                                                          method="post"
+                                                          onsubmit="return confirm('¿Deseas eliminar este estado de membresía?');">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-body"
+                             th:if="${estadosListado == null or #lists.isEmpty(estadosListado)}">
+                            <div class="alert alert-secondary mb-0">
+                                No hay estados de membresía registrados todavía.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer th:replace="~{layout/plantilla :: footer}"></footer>
+    </body>
+</html>

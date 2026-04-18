@@ -21,6 +21,7 @@ com\gym\domain\Caja.class
 com\gym\Repository\PagoRepository.class
 com\gym\Repository\ParametroSistemaRepository.class
 com\gym\Repository\UsuarioRepository.class
+com\gym\controller\EstadoMembresiaAdminController.class
 com\gym\config\CurrentUserAdvice.class
 com\gym\controller\PasswordController.class
 com\gym\Repository\MembresiaRepository.class
