@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{layout/plantilla :: head}"></head>
 
@@ -10,15 +9,15 @@
 
 <section class="py-5 bg-light border-bottom">
     <div class="container">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
             <div>
-                <h1 class="display-6 fw-bold mb-1">Administración de membresías</h1>
+                <h1 class="display-6 fw-bold mb-2">Gestión de membresías</h1>
                 <p class="text-muted mb-0">
-                    Consulta de membresías asignadas a usuarios del sistema.
+                    Consulta de tipos de membresía y membresías registradas en el sistema.
                 </p>
             </div>
-            <a th:href="@{/admin}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
             </a>
         </div>
     </div>
@@ -26,26 +25,27 @@
 
 <main class="container py-5">
     <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Tipos de membresía disponibles</h5>
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Tipos de membresía disponibles</h4>
         </div>
 
         <div class="card-body" th:if="${tiposMembresia != null and !#lists.isEmpty(tiposMembresia)}">
-            <div class="row g-3">
+            <div class="row g-4">
                 <div class="col-md-6 col-xl-4" th:each="tipo : ${tiposMembresia}">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title fw-bold" th:text="${tipo.nombre}">Premium</h5>
-                            <p class="mb-2">
-                                <strong>Días:</strong>
+                            <p class="text-muted mb-2">
+                                Duración:
                                 <span th:text="${tipo.cantidadDias}">30</span>
+                                días
                             </p>
                             <p class="mb-2">
-                                <strong>Precio:</strong>
+                                Precio:
                                 ₡ <span th:text="${tipo.precio}">0</span>
                             </p>
                             <p class="mb-0">
-                                <strong>Acceso global:</strong>
+                                Acceso global:
                                 <span th:text="${tipo.accesoGlobal != null ? tipo.accesoGlobal : 'No definido'}">Sí</span>
                             </p>
                         </div>
@@ -56,20 +56,20 @@
 
         <div class="card-body" th:if="${tiposMembresia == null or #lists.isEmpty(tiposMembresia)}">
             <div class="alert alert-secondary mb-0">
-                No hay tipos de membresía registrados.
+                No hay tipos de membresía registrados todavía.
             </div>
         </div>
     </div>
 
     <div class="card shadow border-0">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">Listado de membresías</h5>
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Membresías registradas</h4>
         </div>
 
         <div class="card-body" th:if="${membresias != null and !#lists.isEmpty(membresias)}">
             <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-dark">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
                     <tr>
                         <th>ID</th>
                         <th>Usuario</th>
@@ -87,22 +87,22 @@
                             Usuario
                         </td>
                         <td th:text="${m.tipoMembresia != null ? m.tipoMembresia.nombre : 'Sin tipo'}">
-                            Sin tipo
+                            Tipo
                         </td>
                         <td>
                             <span class="badge bg-secondary"
                                   th:text="${m.estadoMembresia != null ? m.estadoMembresia.nombreEstado : 'Sin estado'}">
-                                Sin estado
+                                Estado
                             </span>
                         </td>
                         <td th:text="${m.sucursal != null ? m.sucursal.nombre : 'Sin sucursal'}">
-                            Sin sucursal
+                            Sucursal
                         </td>
-                        <td th:text="${m.fechaInicio != null ? #temporals.format(m.fechaInicio, 'yyyy-MM-dd') : ''}">
+                        <td th:text="${m.fechaInicio != null ? #dates.format(m.fechaInicio, 'yyyy-MM-dd') : ''}">
                             2026-01-01
                         </td>
-                        <td th:text="${m.fechaVencimiento != null ? #temporals.format(m.fechaVencimiento, 'yyyy-MM-dd') : ''}">
-                            2026-01-30
+                        <td th:text="${m.fechaVencimiento != null ? #dates.format(m.fechaVencimiento, 'yyyy-MM-dd') : ''}">
+                            2026-01-31
                         </td>
                     </tr>
                     </tbody>
@@ -112,7 +112,7 @@
 
         <div class="card-body" th:if="${membresias == null or #lists.isEmpty(membresias)}">
             <div class="alert alert-secondary mb-0">
-                No hay membresías registradas para mostrar.
+                No hay membresías registradas todavía.
             </div>
         </div>
     </div>

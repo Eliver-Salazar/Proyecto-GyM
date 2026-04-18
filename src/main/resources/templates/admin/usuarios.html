@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{layout/plantilla :: head}"></head>
 
@@ -10,67 +9,192 @@
 
 <section class="py-5 bg-light border-bottom">
     <div class="container">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
             <div>
-                <h1 class="display-6 fw-bold mb-1">Administración de usuarios</h1>
+                <h1 class="display-6 fw-bold mb-2">Gestión de usuarios</h1>
                 <p class="text-muted mb-0">
-                    Consulta de usuarios registrados en el sistema Warrior Gym.
+                    Administración de usuarios y asignación de roles del sistema.
                 </p>
             </div>
-            <a th:href="@{/admin}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
             </a>
         </div>
     </div>
 </section>
 
 <main class="container py-5">
-    <div class="card shadow border-0">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">Listado de usuarios</h5>
-        </div>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicion} ? 'Editar usuario' : 'Registrar usuario'">
+                        Registrar usuario
+                    </h4>
+                </div>
 
-        <div class="card-body" th:if="${usuarios != null and !#lists.isEmpty(usuarios)}">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre completo</th>
-                        <th>Correo</th>
-                        <th>Teléfono</th>
-                        <th>Cédula</th>
-                        <th>Rol</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="u : ${usuarios}">
-                        <td th:text="${u.idUsuario}">1</td>
-                        <td th:text="${(u.nombre != null ? u.nombre : '') + ' ' + (u.apellido != null ? u.apellido : '')}">
-                            Nombre Apellido
-                        </td>
-                        <td th:text="${u.correo}">correo@ejemplo.com</td>
-                        <td th:text="${u.telefono != null and !#strings.isEmpty(u.telefono) ? u.telefono : 'No registrado'}">
-                            No registrado
-                        </td>
-                        <td th:text="${u.cedula != null and !#strings.isEmpty(u.cedula) ? u.cedula : 'No registrada'}">
-                            No registrada
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary"
-                                  th:text="${u.rol != null ? u.rol.nombre : 'SIN ROL'}">
-                                SIN ROL
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <form th:action="@{/admin/usuarios/guardar}" th:object="${usuarioForm}" method="post">
+                        <input type="hidden" th:field="*{idUsuario}"/>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Nombre</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Apellido</label>
+                                <input type="text" class="form-control" th:field="*{apellido}" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Correo</label>
+                                <input type="email" class="form-control" th:field="*{correo}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{telefono}"
+                                       required
+                                       pattern="[0-9]{8}"
+                                       maxlength="8"
+                                       placeholder="88888888">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Cédula</label>
+                                <input type="text" class="form-control" th:field="*{cedula}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Fecha de nacimiento</label>
+                                <input type="date" class="form-control" th:field="*{fechaNacimiento}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Rol</label>
+                                <select class="form-select" th:field="*{rol.idRol}" required>
+                                    <option value="">Seleccione un rol</option>
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.idRol}"
+                                            th:text="${r.nombre}">
+                                        ROL
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    Contraseña
+                                    <span class="text-muted"
+                                          th:text="${modoEdicion} ? '(opcional si no desea cambiarla)' : '(si se deja vacía se usará 1234)'">
+                                        (si se deja vacía se usará 1234)
+                                    </span>
+                                </label>
+                                <input type="text" class="form-control" th:field="*{contrasenia}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Contacto de emergencia</label>
+                                <input type="text" class="form-control" th:field="*{contactoEmergencia}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono de emergencia</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{telefonoEmergencia}"
+                                       required
+                                       pattern="[0-9]{8}"
+                                       maxlength="8"
+                                       placeholder="88888888">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Condición médica</label>
+                                <textarea class="form-control" rows="3" th:field="*{condicionMedica}"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicion} ? 'Actualizar usuario' : 'Guardar usuario'">
+                                    Guardar usuario
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicion}" th:href="@{/admin/usuarios}" class="btn btn-outline-secondary">
+                                Cancelar edición
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <div class="card-body" th:if="${usuarios == null or #lists.isEmpty(usuarios)}">
-            <div class="alert alert-secondary mb-0">
-                No hay usuarios registrados para mostrar.
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Usuarios registrados</h4>
+                </div>
+
+                <div class="card-body p-0" th:if="${usuarios != null and !#lists.isEmpty(usuarios)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="u : ${usuarios}">
+                                <td th:text="${u.idUsuario}">1</td>
+                                <td th:text="${(u.nombre != null ? u.nombre : '') + ' ' + (u.apellido != null ? u.apellido : '')}">
+                                    Nombre Apellido
+                                </td>
+                                <td th:text="${u.correo}">correo@correo.com</td>
+                                <td>
+                                    <span class="badge bg-secondary"
+                                          th:text="${u.rol != null ? u.rol.nombre : 'SIN ROL'}">
+                                        ROL
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/usuarios/editar/{id}(id=${u.idUsuario})}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/usuarios/eliminar/{id}(id=${u.idUsuario})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar este usuario?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body" th:if="${usuarios == null or #lists.isEmpty(usuarios)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay usuarios registrados todavía.
+                    </div>
+                </div>
             </div>
         </div>
     </div>

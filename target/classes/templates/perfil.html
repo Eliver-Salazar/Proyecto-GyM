@@ -12,7 +12,7 @@
     <div class="container text-center">
         <h1 class="display-6 fw-bold mb-2">Mi perfil</h1>
         <p class="text-muted mb-0">
-            Información personal, membresía actual y actividad reciente.
+            Información personal, membresía actual y estado general del usuario.
         </p>
     </div>
 </section>
@@ -85,43 +85,8 @@
             </div>
         </div>
 
-        <div class="col-lg-8 d-flex flex-column gap-4">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <small class="text-muted d-block">Estado actual</small>
-                            <h5 class="fw-bold mb-0"
-                                th:text="${membresiaActual != null and membresiaActual.estadoMembresia != null ? membresiaActual.estadoMembresia.nombreEstado : 'Sin membresía'}">
-                                Sin membresía
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <small class="text-muted d-block">Días restantes</small>
-                            <h5 class="fw-bold mb-0" th:text="${diasRestantes}">0</h5>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <small class="text-muted d-block">Pagos recientes</small>
-                            <h5 class="fw-bold mb-0"
-                                th:text="${'₡ ' + #numbers.formatDecimal(totalPagadoReciente, 1, 'COMMA', 2, 'POINT')}">
-                                ₡ 0.00
-                            </h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow border-0">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 mb-4">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">Datos de la cuenta</h5>
                 </div>
@@ -188,6 +153,7 @@
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0">Membresía actual</h5>
                 </div>
+
                 <div class="card-body" th:if="${membresiaActual != null}">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -225,74 +191,6 @@
                 <div class="card-body" th:if="${membresiaActual == null}">
                     <div class="alert alert-secondary mb-0">
                         No hay una membresía registrada para este usuario.
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="card shadow border-0 h-100">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">Pagos recientes</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Monto</th>
-                                        <th>Referencia</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:if="${#lists.isEmpty(pagosRecientes)}">
-                                        <td colspan="3" class="text-center text-muted py-4">
-                                            No hay pagos registrados.
-                                        </td>
-                                    </tr>
-                                    <tr th:each="p : ${pagosRecientes}">
-                                        <td th:text="${p.fechaPago != null ? #dates.format(p.fechaPago, 'yyyy-MM-dd') : ''}">2026-01-01</td>
-                                        <td th:text="${'₡ ' + #numbers.formatDecimal(p.monto, 1, 'COMMA', 2, 'POINT')}">₡ 0.00</td>
-                                        <td th:text="${p.referencia != null ? p.referencia : '-'}">REF</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="card shadow border-0 h-100">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">Accesos recientes</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Resultado</th>
-                                        <th>Sucursal</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:if="${#lists.isEmpty(accesosRecientes)}">
-                                        <td colspan="3" class="text-center text-muted py-4">
-                                            No hay accesos registrados.
-                                        </td>
-                                    </tr>
-                                    <tr th:each="a : ${accesosRecientes}">
-                                        <td th:text="${a.fechaHora != null ? #dates.format(a.fechaHora, 'yyyy-MM-dd HH:mm') : ''}">2026-01-01 08:00</td>
-                                        <td th:text="${a.resultado != null ? a.resultado : '-'}">OK</td>
-                                        <td th:text="${a.sucursal != null ? a.sucursal.nombre : '-'}">Sucursal</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

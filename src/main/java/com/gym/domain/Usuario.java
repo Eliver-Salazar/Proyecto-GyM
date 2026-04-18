@@ -1,6 +1,8 @@
 package com.gym.domain;
 
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -36,6 +38,7 @@ public class Usuario implements Serializable {
     private String cedula;
 
     @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "FECHA_NACIMIENTO", nullable = false)
     private Date fechaNacimiento;
 
