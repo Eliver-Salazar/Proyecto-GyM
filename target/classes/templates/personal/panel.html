@@ -9,46 +9,173 @@
 <header th:replace="~{layout/plantilla :: header}"></header>
 
 <section class="py-5 bg-light border-bottom">
-    <div class="container text-center">
-        <h1 class="display-6 fw-bold mb-2">Panel del personal</h1>
-        <p class="text-muted mb-0">
-            Accesos operativos básicos para colaboradores del gimnasio.
-        </p>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-6 fw-bold mb-2">Panel del personal</h1>
+            <p class="text-muted mb-0">
+                Vista operativa para colaboradores del gimnasio.
+            </p>
+        </div>
     </div>
 </section>
 
 <main class="container py-5">
-    <div class="row g-4">
-        <div class="col-md-6">
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
             <div class="card shadow border-0 h-100">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-warning">
-                        <i class="fas fa-address-book fa-3x"></i>
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">
+                        Bienvenido,
+                        <span th:text="${usuarioOperativo != null ? (usuarioOperativo.nombre + ' ' + usuarioOperativo.apellido) : 'Colaborador'}">
+                            Colaborador
+                        </span>
+                    </h4>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <small class="text-muted d-block">Correo</small>
+                                <strong th:text="${usuarioOperativo != null ? usuarioOperativo.correo : 'No disponible'}">
+                                    correo@correo.com
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <small class="text-muted d-block">Rol</small>
+                                <strong th:text="${usuarioOperativo != null and usuarioOperativo.rol != null ? usuarioOperativo.rol.nombre : 'Sin rol'}">
+                                    PERSONAL
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <small class="text-muted d-block">Puesto</small>
+                                <strong th:text="${empleadoActual != null ? empleadoActual.puesto : 'No registrado en EMPLEADOS'}">
+                                    Puesto
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 h-100">
+                                <small class="text-muted d-block">Sucursal</small>
+                                <strong th:text="${empleadoActual != null and empleadoActual.sucursal != null ? empleadoActual.sucursal.nombre : 'No asignada'}">
+                                    Sucursal
+                                </strong>
+                            </div>
+                        </div>
                     </div>
-                    <h4 class="card-title">Socios</h4>
-                    <p class="text-muted">
-                        Consulta de usuarios registrados para apoyo operativo.
-                    </p>
-                    <a th:href="@{/personal/socios}" class="btn btn-warning text-white">
-                        Ver socios
-                    </a>
+
+                    <div class="mt-4 d-flex flex-wrap gap-2">
+                        <a th:href="@{/personal/socios}" class="btn btn-warning text-white">
+                            <i class="fas fa-address-book me-1"></i> Ver socios
+                        </a>
+                        <a th:href="@{/personal/turnos}" class="btn btn-outline-dark">
+                            <i class="fas fa-calendar-alt me-1"></i> Ver turnos
+                        </a>
+                        <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user me-1"></i> Mi perfil
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-lg-4">
             <div class="card shadow border-0 h-100">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-warning">
-                        <i class="fas fa-calendar-alt fa-3x"></i>
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Resumen operativo</h5>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Socios registrados</small>
+                        <h3 class="fw-bold mb-0" th:text="${totalSocios}">0</h3>
                     </div>
-                    <h4 class="card-title">Turnos</h4>
-                    <p class="text-muted">
-                        Vista informativa de turnos y cobertura operativa.
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Membresías registradas</small>
+                        <h3 class="fw-bold mb-0" th:text="${totalMembresias}">0</h3>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Pagos registrados</small>
+                        <h3 class="fw-bold mb-0" th:text="${totalPagos}">0</h3>
+                    </div>
+
+                    <div>
+                        <small class="text-muted d-block">Monto acumulado registrado</small>
+                        <h4 class="fw-bold mb-0"
+                            th:text="${'₡ ' + #numbers.formatDecimal(montoPagos, 1, 'COMMA', 2, 'POINT')}">
+                            ₡ 0.00
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Socios recientes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(sociosRecientes)}">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    No hay socios registrados.
+                                </td>
+                            </tr>
+                            <tr th:each="s : ${sociosRecientes}">
+                                <td th:text="${s.idUsuario}">1</td>
+                                <td th:text="${s.nombre + ' ' + s.apellido}">Nombre Apellido</td>
+                                <td th:text="${s.correo}">correo@correo.com</td>
+                                <td th:text="${s.telefono}">8888-8888</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">Acciones rápidas</h5>
+
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/personal/socios}" class="btn btn-outline-dark">
+                            <i class="fas fa-users me-2"></i>Consultar socios
+                        </a>
+
+                        <a th:href="@{/personal/turnos}" class="btn btn-outline-dark">
+                            <i class="fas fa-clock me-2"></i>Consultar turnos
+                        </a>
+
+                        <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user-circle me-2"></i>Mi perfil
+                        </a>
+                    </div>
+
+                    <hr>
+
+                    <p class="text-muted mb-0">
+                        Este panel queda preparado para conectar luego pagos, cajas, membresías y operación diaria.
                     </p>
-                    <a th:href="@{/personal/turnos}" class="btn btn-warning text-white">
-                        Ver turnos
-                    </a>
                 </div>
             </div>
         </div>

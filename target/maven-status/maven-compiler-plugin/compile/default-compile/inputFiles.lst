@@ -3,6 +3,7 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\PasswordMigrationConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\SecurityConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\ThymeleafConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminController.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AuthController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\IndexController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\MembresiaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\PasswordController.java

@@ -30,10 +30,25 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/",
                     "/login",
+                    "/inscribete",
+                    "/nosotros",
+                    "/faq",
+                    "/contacto",
+                    "/contacto/enviar",
+                    "/horarios",
+                    "/forgot-password",
+                    "/forgot-password/done",
                     "/css/**",
                     "/js/**",
-                    "/images/**"
+                    "/images/**",
+                    "/webjars/**"
                 ).permitAll()
+
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/personal/**").hasAnyRole("ADMIN", "PERSONAL")
+                .requestMatchers("/perfil", "/perfil/**", "/usuario/perfil", "/usuario/perfil/**")
+                    .hasAnyRole("ADMIN", "PERSONAL", "CLIENTE")
+
                 .anyRequest().authenticated()
             )
 
@@ -41,13 +56,14 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/postLogin", true)
+                .failureUrl("/login?error")
                 .permitAll()
             )
 
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login?logout")
                 .permitAll()
             );
 
@@ -64,6 +80,11 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        /*
+         * Se mantiene NoOp EN ESTE BLOQUE porque el script SQL actual inserta
+         * contraseñas planas como '1234'. Luego, en otro bloque, se debe unificar
+         * todo a BCrypt para no mezclar esquemas.
+         */
         return NoOpPasswordEncoder.getInstance();
     }
 }

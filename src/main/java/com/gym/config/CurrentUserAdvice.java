@@ -32,6 +32,7 @@ public class CurrentUserAdvice {
             model.addAttribute("authRoles", roles);
             model.addAttribute("isAdmin", roles.contains("ROLE_ADMIN"));
             model.addAttribute("isPersonal", roles.contains("ROLE_PERSONAL"));
+            model.addAttribute("isCliente", roles.contains("ROLE_CLIENTE"));
 
             Usuario usuario = usuarioRepository.findByCorreo(auth.getName()).orElse(null);
             model.addAttribute("usuarioActual", usuario);
@@ -41,6 +42,7 @@ public class CurrentUserAdvice {
             model.addAttribute("authRoles", Set.of());
             model.addAttribute("isAdmin", false);
             model.addAttribute("isPersonal", false);
+            model.addAttribute("isCliente", false);
         }
     }
 }

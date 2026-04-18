@@ -1,12 +1,18 @@
 package com.gym.controller;
 
+import com.gym.Repository.BitacoraAccesoRepository;
 import com.gym.Repository.MembresiaRepository;
+import com.gym.Repository.PagoRepository;
 import com.gym.Repository.UsuarioRepository;
+import com.gym.domain.BitacoraAcceso;
 import com.gym.domain.Membresia;
+import com.gym.domain.Pago;
 import com.gym.domain.Usuario;
 import com.gym.service.UsuarioService;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Controller;
@@ -21,17 +27,23 @@ public class PerfilController {
 
     private final UsuarioRepository usuarioRepository;
     private final MembresiaRepository membresiaRepository;
+    private final PagoRepository pagoRepository;
+    private final BitacoraAccesoRepository bitacoraAccesoRepository;
     private final UsuarioService usuarioService;
 
     public PerfilController(UsuarioRepository usuarioRepository,
                             MembresiaRepository membresiaRepository,
+                            PagoRepository pagoRepository,
+                            BitacoraAccesoRepository bitacoraAccesoRepository,
                             UsuarioService usuarioService) {
         this.usuarioRepository = usuarioRepository;
         this.membresiaRepository = membresiaRepository;
+        this.pagoRepository = pagoRepository;
+        this.bitacoraAccesoRepository = bitacoraAccesoRepository;
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/perfil")
+    @GetMapping({"/perfil", "/usuario/perfil"})
     public String perfil(Model model, Principal principal) {
         if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
             return "redirect:/login";
@@ -53,12 +65,33 @@ public class PerfilController {
                 ))
                 .orElse(null);
 
+        List<Pago> pagosRecientes = pagoRepository.findByUsuarioIdUsuario(usuario.getIdUsuario()).stream()
+                .sorted(Comparator.comparing(Pago::getFechaPago, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .limit(5)
+                .toList();
+
+        List<BitacoraAcceso> accesosRecientes = bitacoraAccesoRepository
+                .findByUsuarioIdUsuarioOrderByFechaHoraDesc(usuario.getIdUsuario())
+                .stream()
+                .limit(5)
+                .toList();
+
+        BigDecimal totalPagado = pagosRecientes.stream()
+                .map(p -> p.getMonto() != null ? p.getMonto() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        long diasRestantes = calcularDiasRestantes(membresiaActual);
+
         model.addAttribute("membresiaActual", membresiaActual);
+        model.addAttribute("pagosRecientes", pagosRecientes);
+        model.addAttribute("accesosRecientes", accesosRecientes);
+        model.addAttribute("totalPagadoReciente", totalPagado);
+        model.addAttribute("diasRestantes", diasRestantes);
 
         return "perfil";
     }
 
-    @GetMapping("/perfil/editar")
+    @GetMapping({"/perfil/editar", "/usuario/perfil/editar"})
     public String editarPerfil(Model model, Principal principal) {
         if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
             return "redirect:/login";
@@ -73,7 +106,7 @@ public class PerfilController {
         return "perfil-editar";
     }
 
-    @PostMapping("/perfil/editar")
+    @PostMapping({"/perfil/editar", "/usuario/perfil/editar"})
     public String guardarPerfil(@ModelAttribute("u") Usuario formulario,
                                 Principal principal,
                                 RedirectAttributes redirectAttributes) {
@@ -115,5 +148,16 @@ public class PerfilController {
 
         redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado correctamente.");
         return "redirect:/perfil";
+    }
+
+    private long calcularDiasRestantes(Membresia membresiaActual) {
+        if (membresiaActual == null || membresiaActual.getFechaVencimiento() == null) {
+            return 0;
+        }
+
+        long diferencia = membresiaActual.getFechaVencimiento().getTime() - new Date().getTime();
+        long dias = diferencia / (1000L * 60L * 60L * 24L);
+
+        return Math.max(dias, 0);
     }
 }

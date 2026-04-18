@@ -9,17 +9,103 @@
 <header th:replace="~{layout/plantilla :: header}"></header>
 
 <section class="py-5 bg-light border-bottom">
-    <div class="container text-center">
-        <h1 class="display-6 fw-bold mb-2">Panel de administración</h1>
-        <p class="text-muted mb-0">
-            Módulos principales de gestión del sistema Warrior Gym.
-        </p>
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-6 fw-bold mb-2">Panel de administración</h1>
+            <p class="text-muted mb-0">
+                Resumen general del sistema Warrior Gym y accesos rápidos a los módulos principales.
+            </p>
+        </div>
     </div>
 </section>
 
 <main class="container py-5">
-    <div class="row g-4">
-        <div class="col-md-4">
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2"><i class="fas fa-users fa-2x"></i></div>
+                    <h6 class="text-muted mb-1">Usuarios</h6>
+                    <h2 class="fw-bold" th:text="${totalUsuarios}">0</h2>
+                    <small class="text-muted">Total registrados</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2"><i class="fas fa-id-card fa-2x"></i></div>
+                    <h6 class="text-muted mb-1">Membresías</h6>
+                    <h2 class="fw-bold" th:text="${totalMembresias}">0</h2>
+                    <small class="text-muted">Asignadas en el sistema</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2"><i class="fas fa-layer-group fa-2x"></i></div>
+                    <h6 class="text-muted mb-1">Tipos</h6>
+                    <h2 class="fw-bold" th:text="${totalTipos}">0</h2>
+                    <small class="text-muted">Tipos de membresía</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2"><i class="fas fa-credit-card fa-2x"></i></div>
+                    <h6 class="text-muted mb-1">Pagos</h6>
+                    <h2 class="fw-bold" th:text="${totalPagos}">0</h2>
+                    <small class="text-muted">Transacciones registradas</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Clientes</h6>
+                    <h3 class="fw-bold mb-0" th:text="${totalClientes}">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Personal</h6>
+                    <h3 class="fw-bold mb-0" th:text="${totalPersonal}">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Administradores</h6>
+                    <h3 class="fw-bold mb-0" th:text="${totalAdmins}">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">Sucursales</h6>
+                    <h3 class="fw-bold mb-0" th:text="${totalSucursales}">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
             <div class="card shadow border-0 h-100">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-warning">
@@ -27,16 +113,16 @@
                     </div>
                     <h4 class="card-title">Usuarios</h4>
                     <p class="text-muted">
-                        Consulta de usuarios registrados y sus roles asignados.
+                        Gestiona la información de usuarios y revisa roles registrados.
                     </p>
                     <a th:href="@{/admin/usuarios}" class="btn btn-warning text-white">
-                        Ver usuarios
+                        Ir a usuarios
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow border-0 h-100">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-warning">
@@ -44,16 +130,16 @@
                     </div>
                     <h4 class="card-title">Membresías</h4>
                     <p class="text-muted">
-                        Consulta de tipos de membresía y membresías asignadas.
+                        Consulta membresías asignadas y tipos de membresía disponibles.
                     </p>
                     <a th:href="@{/admin/membresias}" class="btn btn-warning text-white">
-                        Ver membresías
+                        Ir a membresías
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card shadow border-0 h-100">
                 <div class="card-body text-center p-4">
                     <div class="mb-3 text-warning">
@@ -61,11 +147,86 @@
                     </div>
                     <h4 class="card-title">Reportes</h4>
                     <p class="text-muted">
-                        Resumen general del estado actual del sistema.
+                        Visualiza información resumida del estado general del sistema.
                     </p>
                     <a th:href="@{/admin/reportes}" class="btn btn-warning text-white">
-                        Ver reportes
+                        Ir a reportes
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Usuarios recientes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(usuariosRecientes)}">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    No hay usuarios registrados.
+                                </td>
+                            </tr>
+                            <tr th:each="u : ${usuariosRecientes}">
+                                <td th:text="${u.idUsuario}">1</td>
+                                <td th:text="${u.nombre + ' ' + u.apellido}">Nombre Apellido</td>
+                                <td th:text="${u.correo}">correo@correo.com</td>
+                                <td>
+                                    <span class="badge bg-secondary"
+                                          th:text="${u.rol != null ? u.rol.nombre : 'SIN ROL'}">ROL</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Membresías recientes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(membresiasRecientes)}">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    No hay membresías registradas.
+                                </td>
+                            </tr>
+                            <tr th:each="m : ${membresiasRecientes}">
+                                <td th:text="${m.idMembresia}">1</td>
+                                <td th:text="${m.usuario != null ? (m.usuario.nombre + ' ' + m.usuario.apellido) : 'Sin usuario'}">Usuario</td>
+                                <td th:text="${m.tipoMembresia != null ? m.tipoMembresia.nombre : 'Sin tipo'}">Tipo</td>
+                                <td th:text="${m.estadoMembresia != null ? m.estadoMembresia.nombreEstado : 'Sin estado'}">Estado</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

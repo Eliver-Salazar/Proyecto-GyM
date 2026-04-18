@@ -42,10 +42,6 @@
                         <a class="nav-link" th:href="@{/nosotros}">Sobre nosotros</a>
                     </li>
 
-                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link" th:href="@{/admin/membresias}">Membresías</a>
-                    </li>
-
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/horarios}">Horarios</a>
                     </li>
@@ -58,12 +54,16 @@
                         <a class="nav-link" th:href="@{/contacto}">Contacto</a>
                     </li>
 
-                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','EMPLEADO')">
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin/dashboard}">Administración</a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
                         <a class="nav-link" th:href="@{/personal/panel}">Panel personal</a>
                     </li>
 
-                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link" th:href="@{/admin}">Administración</a>
+                    <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
+                        <a class="nav-link" th:href="@{/perfil}">Mi perfil</a>
                     </li>
                 </ul>
 
@@ -102,22 +102,27 @@
                                 <i class="fas fa-user-circle me-2"></i>Mi perfil
                             </a>
                         </li>
+
                         <li>
                             <a class="dropdown-item" th:href="@{/perfil/editar}">
                                 <i class="fas fa-user-edit me-2"></i>Editar perfil
                             </a>
                         </li>
+
                         <li sec:authorize="hasRole('ADMIN')">
-                            <a class="dropdown-item" th:href="@{/admin}">
+                            <a class="dropdown-item" th:href="@{/admin/dashboard}">
                                 <i class="fas fa-tools me-2"></i>Administración
                             </a>
                         </li>
-                        <li sec:authorize="hasAnyRole('ADMIN','EMPLEADO')">
+
+                        <li sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
                             <a class="dropdown-item" th:href="@{/personal/panel}">
                                 <i class="fas fa-clipboard-list me-2"></i>Panel personal
                             </a>
                         </li>
+
                         <li><hr class="dropdown-divider"></li>
+
                         <li>
                             <form th:action="@{/logout}" method="post" class="px-3">
                                 <button type="submit" class="btn btn-danger w-100">
