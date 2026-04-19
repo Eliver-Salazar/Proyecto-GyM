@@ -11,6 +11,9 @@ import com.gym.domain.Usuario;
 import com.gym.service.UsuarioService;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -77,8 +80,7 @@ public class PerfilController {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         long diasRestantes = calcularDiasRestantes(membresiaActual);
-
-        String estadoVigencia = determinarEstadoVigencia(membresiaActual, diasRestantes);
+        String estadoVigencia = determinarEstadoVigencia(membresiaActual);
         String accesoGlobalTexto = obtenerAccesoGlobalTexto(membresiaActual);
 
         model.addAttribute("membresiaActual", membresiaActual);
@@ -156,24 +158,37 @@ public class PerfilController {
             return 0;
         }
 
-        long diferencia = membresiaActual.getFechaVencimiento().getTime() - new Date().getTime();
-        long dias = diferencia / (1000L * 60L * 60L * 24L);
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaVencimiento = convertirFechaALocalDate(membresiaActual.getFechaVencimiento());
 
-        return Math.max(dias, 0);
+        if (fechaVencimiento.isBefore(hoy)) {
+            return 0;
+        }
+
+        return ChronoUnit.DAYS.between(hoy, fechaVencimiento) + 1;
     }
 
-    private String determinarEstadoVigencia(Membresia membresiaActual, long diasRestantes) {
+    private String determinarEstadoVigencia(Membresia membresiaActual) {
         if (membresiaActual == null) {
             return "SIN MEMBRESÍA";
+        }
+
+        if (membresiaActual.getFechaVencimiento() != null) {
+            LocalDate hoy = LocalDate.now();
+            LocalDate fechaVencimiento = convertirFechaALocalDate(membresiaActual.getFechaVencimiento());
+
+            if (fechaVencimiento.isBefore(hoy)) {
+                return "VENCIDA";
+            }
         }
 
         if (membresiaActual.getEstadoMembresia() != null
                 && membresiaActual.getEstadoMembresia().getNombreEstado() != null
                 && !membresiaActual.getEstadoMembresia().getNombreEstado().isBlank()) {
-            return membresiaActual.getEstadoMembresia().getNombreEstado();
+            return membresiaActual.getEstadoMembresia().getNombreEstado().trim().toUpperCase();
         }
 
-        return diasRestantes > 0 ? "ACTIVA" : "VENCIDA";
+        return "ACTIVA";
     }
 
     private String obtenerAccesoGlobalTexto(Membresia membresiaActual) {
@@ -186,5 +201,19 @@ public class PerfilController {
         return "S".equalsIgnoreCase(membresiaActual.getTipoMembresia().getAccesoGlobal())
                 ? "Sí"
                 : "No";
+    }
+
+    private LocalDate convertirFechaALocalDate(Date fecha) {
+        if (fecha == null) {
+            return null;
+        }
+
+        if (fecha instanceof java.sql.Date sqlDate) {
+            return sqlDate.toLocalDate();
+        }
+
+        return fecha.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
     }
 }

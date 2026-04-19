@@ -76,11 +76,6 @@ public class PersonalController {
         return "personal/panel";
     }
 
-    @GetMapping("/personal/turnos")
-    public String turnos() {
-        return "personal/turnos";
-    }
-
     @GetMapping("/personal/socios")
     public String socios(Model model) {
         List<Usuario> socios = usuarioRepository.findAll().stream()
