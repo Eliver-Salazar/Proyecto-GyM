@@ -82,6 +82,7 @@ public class AdminUsuarioController {
 
         String telefonoNormalizado = limpiarTelefono(usuarioForm.getTelefono());
         String telefonoEmergenciaNormalizado = limpiarTelefono(usuarioForm.getTelefonoEmergencia());
+        String cedulaNormalizada = limpiarCedula(usuarioForm.getCedula());
 
         if (telefonoNormalizado == null || !telefonoNormalizado.matches("\\d{8}")) {
             model.addAttribute("error", "El teléfono debe contener exactamente 8 dígitos.");
@@ -91,6 +92,12 @@ public class AdminUsuarioController {
 
         if (telefonoEmergenciaNormalizado == null || !telefonoEmergenciaNormalizado.matches("\\d{8}")) {
             model.addAttribute("error", "El teléfono de emergencia debe contener exactamente 8 dígitos.");
+            prepararVistaUsuarios(model, usuarioForm, usuarioForm.getIdUsuario() != null);
+            return "admin/usuarios";
+        }
+
+        if (cedulaNormalizada == null || !cedulaNormalizada.matches("\\d{10,20}")) {
+            model.addAttribute("error", "La cédula debe contener únicamente números y tener entre 10 y 20 dígitos.");
             prepararVistaUsuarios(model, usuarioForm, usuarioForm.getIdUsuario() != null);
             return "admin/usuarios";
         }
@@ -114,7 +121,7 @@ public class AdminUsuarioController {
         usuarioGuardar.setApellido(usuarioForm.getApellido());
         usuarioGuardar.setCorreo(usuarioForm.getCorreo());
         usuarioGuardar.setTelefono(telefonoNormalizado);
-        usuarioGuardar.setCedula(usuarioForm.getCedula());
+        usuarioGuardar.setCedula(cedulaNormalizada);
         usuarioGuardar.setFechaNacimiento(usuarioForm.getFechaNacimiento());
         usuarioGuardar.setContactoEmergencia(usuarioForm.getContactoEmergencia());
         usuarioGuardar.setTelefonoEmergencia(telefonoEmergenciaNormalizado);
@@ -144,6 +151,8 @@ public class AdminUsuarioController {
 
                 if (detalleUpper.contains("USUARIOS_TEL_EMERG_CHK")) {
                     mensaje = "El teléfono de emergencia no cumple el formato requerido por la base de datos.";
+                } else if (detalleUpper.contains("USUARIOS_CEDULA_NUM_CHK")) {
+                    mensaje = "La cédula debe contener únicamente números y tener entre 10 y 20 dígitos.";
                 } else if (detalleUpper.contains("CORREO")) {
                     mensaje = "Ya existe un usuario registrado con ese correo.";
                 } else if (detalleUpper.contains("CEDULA")) {
@@ -204,5 +213,12 @@ public class AdminUsuarioController {
             return null;
         }
         return telefono.replaceAll("[^0-9]", "").trim();
+    }
+
+    private String limpiarCedula(String cedula) {
+        if (cedula == null) {
+            return null;
+        }
+        return cedula.replaceAll("[^0-9]", "").trim();
     }
 }

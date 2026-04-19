@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -137,17 +138,50 @@ public class PerfilController {
             return "redirect:/perfil/editar";
         }
 
+        String cedulaNormalizada = limpiarCedula(formulario.getCedula());
+
+        if (cedulaNormalizada == null || !cedulaNormalizada.matches("\\d{10,20}")) {
+            redirectAttributes.addFlashAttribute("error", "La cédula debe contener únicamente números y tener entre 10 y 20 dígitos.");
+            return "redirect:/perfil/editar";
+        }
+
         usuarioActual.setNombre(formulario.getNombre());
         usuarioActual.setApellido(formulario.getApellido());
         usuarioActual.setCorreo(formulario.getCorreo());
         usuarioActual.setTelefono(formulario.getTelefono());
-        usuarioActual.setCedula(formulario.getCedula());
+        usuarioActual.setCedula(cedulaNormalizada);
         usuarioActual.setFechaNacimiento(formulario.getFechaNacimiento());
         usuarioActual.setContactoEmergencia(formulario.getContactoEmergencia());
         usuarioActual.setTelefonoEmergencia(formulario.getTelefonoEmergencia());
         usuarioActual.setCondicionMedica(formulario.getCondicionMedica());
 
-        usuarioService.guardarUsuario(usuarioActual);
+        try {
+            usuarioService.guardarUsuario(usuarioActual);
+        } catch (DataIntegrityViolationException ex) {
+            String mensaje = "No se pudo actualizar el perfil por una restricción de base de datos.";
+
+            String detalle = ex.getMostSpecificCause() != null
+                    ? ex.getMostSpecificCause().getMessage()
+                    : ex.getMessage();
+
+            if (detalle != null) {
+                String detalleUpper = detalle.toUpperCase();
+
+                if (detalleUpper.contains("USUARIOS_CEDULA_NUM_CHK")) {
+                    mensaje = "La cédula debe contener únicamente números y tener entre 10 y 20 dígitos.";
+                } else if (detalleUpper.contains("CORREO")) {
+                    mensaje = "Ya existe otro usuario registrado con ese correo.";
+                } else if (detalleUpper.contains("CEDULA")) {
+                    mensaje = "Ya existe otro usuario registrado con esa cédula.";
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("error", mensaje);
+            return "redirect:/perfil/editar";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Ocurrió un error inesperado al actualizar el perfil.");
+            return "redirect:/perfil/editar";
+        }
 
         redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado correctamente.");
         return "redirect:/perfil";
@@ -215,5 +249,12 @@ public class PerfilController {
         return fecha.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    private String limpiarCedula(String cedula) {
+        if (cedula == null) {
+            return null;
+        }
+        return cedula.replaceAll("[^0-9]", "").trim();
     }
 }
