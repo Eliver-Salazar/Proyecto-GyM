@@ -5,15 +5,19 @@ import com.gym.Repository.EmpleadoRepository;
 import com.gym.Repository.MembresiaRepository;
 import com.gym.Repository.MetodoPagoRepository;
 import com.gym.Repository.PagoRepository;
+import com.gym.Repository.TipoMembresiaRepository;
 import com.gym.Repository.UsuarioRepository;
 import com.gym.domain.Caja;
 import com.gym.domain.Empleado;
 import com.gym.domain.Membresia;
 import com.gym.domain.MetodoPago;
 import com.gym.domain.Pago;
+import com.gym.domain.TipoMembresia;
 import com.gym.domain.Usuario;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -38,19 +42,22 @@ public class AdminPagoController {
     private final MetodoPagoRepository metodoPagoRepository;
     private final CajaRepository cajaRepository;
     private final EmpleadoRepository empleadoRepository;
+    private final TipoMembresiaRepository tipoMembresiaRepository;
 
     public AdminPagoController(PagoRepository pagoRepository,
                                UsuarioRepository usuarioRepository,
                                MembresiaRepository membresiaRepository,
                                MetodoPagoRepository metodoPagoRepository,
                                CajaRepository cajaRepository,
-                               EmpleadoRepository empleadoRepository) {
+                               EmpleadoRepository empleadoRepository,
+                               TipoMembresiaRepository tipoMembresiaRepository) {
         this.pagoRepository = pagoRepository;
         this.usuarioRepository = usuarioRepository;
         this.membresiaRepository = membresiaRepository;
         this.metodoPagoRepository = metodoPagoRepository;
         this.cajaRepository = cajaRepository;
         this.empleadoRepository = empleadoRepository;
+        this.tipoMembresiaRepository = tipoMembresiaRepository;
     }
 
     @GetMapping("/admin/pagos")
@@ -71,7 +78,14 @@ public class AdminPagoController {
             return "redirect:/admin/pagos";
         }
 
-        prepararVistaPagos(model, pagoOpt.get(), true);
+        Pago pago = pagoOpt.get();
+        inicializarRelacionesSiSonNull(pago);
+
+        if (pago.getMembresia() != null && pago.getMembresia().getTipoMembresia() == null) {
+            pago.getMembresia().setTipoMembresia(new TipoMembresia());
+        }
+
+        prepararVistaPagos(model, pago, true);
         return "admin/pagos";
     }
 
@@ -83,17 +97,21 @@ public class AdminPagoController {
         boolean esEdicion = pagoForm.getIdPago() != null;
         inicializarRelacionesSiSonNull(pagoForm);
 
+        if (pagoForm.getMembresia().getTipoMembresia() == null) {
+            pagoForm.getMembresia().setTipoMembresia(new TipoMembresia());
+        }
+
         if (pagoForm.getUsuario().getIdUsuario() == null
+                || pagoForm.getMembresia().getTipoMembresia().getIdTipoMembresia() == null
                 || pagoForm.getMetodoPago().getIdMetodoPago() == null
                 || pagoForm.getCaja().getIdCaja() == null
                 || pagoForm.getEmpleado().getIdEmpleado() == null
-                || pagoForm.getMonto() == null
                 || pagoForm.getFechaPago() == null
                 || pagoForm.getActivo() == null
                 || pagoForm.getActivo().isBlank()) {
 
             model.addAttribute("error",
-                    "Debes seleccionar cliente, método de pago, caja, empleado, monto, fecha y estado activo.");
+                    "Debes seleccionar cliente, tipo de membresía, método de pago, caja, empleado, fecha y estado activo.");
             prepararVistaPagos(model, pagoForm, esEdicion);
             return "admin/pagos";
         }
@@ -122,6 +140,31 @@ public class AdminPagoController {
             return "admin/pagos";
         }
 
+        Membresia membresiaSeleccionada = membresiaOpt.get();
+
+        Optional<TipoMembresia> tipoOpt = tipoMembresiaRepository.findById(
+                pagoForm.getMembresia().getTipoMembresia().getIdTipoMembresia()
+        );
+        if (tipoOpt.isEmpty()) {
+            model.addAttribute("error", "El tipo de membresía seleccionado no existe.");
+            prepararVistaPagos(model, pagoForm, esEdicion);
+            return "admin/pagos";
+        }
+
+        TipoMembresia tipoSeleccionado = tipoOpt.get();
+
+        if (tipoSeleccionado.getPrecio() == null || tipoSeleccionado.getPrecio().compareTo(BigDecimal.ZERO) < 0) {
+            model.addAttribute("error", "El tipo de membresía seleccionado no tiene un precio válido.");
+            prepararVistaPagos(model, pagoForm, esEdicion);
+            return "admin/pagos";
+        }
+
+        if (tipoSeleccionado.getCantidadDias() == null || tipoSeleccionado.getCantidadDias() <= 0) {
+            model.addAttribute("error", "El tipo de membresía seleccionado no tiene una cantidad de días válida.");
+            prepararVistaPagos(model, pagoForm, esEdicion);
+            return "admin/pagos";
+        }
+
         Optional<MetodoPago> metodoOpt = metodoPagoRepository.findById(pagoForm.getMetodoPago().getIdMetodoPago());
         if (metodoOpt.isEmpty()) {
             model.addAttribute("error", "El método de pago seleccionado no existe.");
@@ -143,24 +186,16 @@ public class AdminPagoController {
             return "admin/pagos";
         }
 
-        if (pagoForm.getMonto().compareTo(BigDecimal.ZERO) < 0) {
-            model.addAttribute("error", "El monto del pago no puede ser negativo.");
-            prepararVistaPagos(model, pagoForm, esEdicion);
-            return "admin/pagos";
-        }
-
         String activoNormalizado = pagoForm.getActivo().trim().toUpperCase();
-        pagoForm.setActivo(activoNormalizado);
-
         if (!"S".equals(activoNormalizado) && !"N".equals(activoNormalizado)) {
             model.addAttribute("error", "El campo activo debe ser 'S' o 'N'.");
             prepararVistaPagos(model, pagoForm, esEdicion);
             return "admin/pagos";
         }
 
+        String referenciaNormalizada = null;
         if (pagoForm.getReferencia() != null && !pagoForm.getReferencia().isBlank()) {
-            String referenciaNormalizada = pagoForm.getReferencia().trim().replaceAll("\\s+", " ").toUpperCase();
-            pagoForm.setReferencia(referenciaNormalizada);
+            referenciaNormalizada = pagoForm.getReferencia().trim().replaceAll("\\s+", " ").toUpperCase();
 
             if (referenciaNormalizada.length() > 50) {
                 model.addAttribute("error", "La referencia no puede superar los 50 caracteres.");
@@ -175,8 +210,17 @@ public class AdminPagoController {
             }
         }
 
-        Pago pagoGuardar;
+        BigDecimal montoCalculado = tipoSeleccionado.getPrecio();
 
+        // Actualiza la membresía única del cliente según el plan pagado
+        membresiaSeleccionada.setTipoMembresia(tipoSeleccionado);
+        membresiaSeleccionada.setFechaInicio(pagoForm.getFechaPago());
+        membresiaSeleccionada.setFechaVencimiento(calcularFechaVencimiento(
+                pagoForm.getFechaPago(),
+                tipoSeleccionado.getCantidadDias()
+        ));
+
+        Pago pagoGuardar;
         if (esEdicion) {
             Optional<Pago> pagoOpt = pagoRepository.findById(pagoForm.getIdPago());
             if (pagoOpt.isEmpty()) {
@@ -189,38 +233,24 @@ public class AdminPagoController {
         }
 
         pagoGuardar.setUsuario(usuarioSeleccionado);
-        pagoGuardar.setMembresia(membresiaOpt.get());
+        pagoGuardar.setMembresia(membresiaSeleccionada);
         pagoGuardar.setMetodoPago(metodoOpt.get());
         pagoGuardar.setCaja(cajaOpt.get());
         pagoGuardar.setEmpleado(empleadoOpt.get());
-        pagoGuardar.setMonto(pagoForm.getMonto());
+        pagoGuardar.setMonto(montoCalculado);
         pagoGuardar.setFechaPago(pagoForm.getFechaPago());
-        pagoGuardar.setReferencia(
-                pagoForm.getReferencia() == null || pagoForm.getReferencia().isBlank()
-                        ? null
-                        : pagoForm.getReferencia()
-        );
+        pagoGuardar.setReferencia(referenciaNormalizada);
         pagoGuardar.setActivo(activoNormalizado);
 
         try {
+            membresiaRepository.save(membresiaSeleccionada);
             pagoRepository.save(pagoGuardar);
         } catch (DataIntegrityViolationException ex) {
             String detalle = ex.getMostSpecificCause() != null
                     ? ex.getMostSpecificCause().getMessage()
                     : ex.getMessage();
 
-            String detalleUpper = detalle != null ? detalle.toUpperCase() : "";
-            String mensaje = "No se pudo guardar el pago por una restricción de base de datos.";
-
-            if (detalleUpper.contains("ORA-02291")) {
-                mensaje = "Una de las relaciones seleccionadas no existe en la base de datos.";
-            } else if (detalleUpper.contains("ORA-02290")) {
-                mensaje = "El pago no cumple una validación definida en la base de datos.";
-            } else if (detalleUpper.contains("ACTIVO")) {
-                mensaje = "El valor de activo no cumple el formato esperado por la base de datos.";
-            }
-
-            model.addAttribute("error", mensaje);
+            model.addAttribute("error", "No se pudo guardar el pago por una restricción de base de datos.");
             model.addAttribute("errorTecnicoPago", detalle);
             prepararVistaPagos(model, pagoForm, esEdicion);
             return "admin/pagos";
@@ -271,6 +301,10 @@ public class AdminPagoController {
     private void prepararVistaPagos(Model model, Pago pagoForm, boolean modoEdicion) {
         inicializarRelacionesSiSonNull(pagoForm);
 
+        if (pagoForm.getMembresia().getTipoMembresia() == null) {
+            pagoForm.getMembresia().setTipoMembresia(new TipoMembresia());
+        }
+
         model.addAttribute("pagosListado", pagoRepository.findAll().stream()
                 .sorted(Comparator.comparing(Pago::getIdPago, Comparator.nullsLast(Long::compareTo)).reversed())
                 .toList());
@@ -282,6 +316,10 @@ public class AdminPagoController {
                 .toList();
 
         model.addAttribute("usuariosDisponibles", clientesConMembresia);
+
+        model.addAttribute("tiposMembresiaDisponibles", tipoMembresiaRepository.findAll().stream()
+                .sorted(Comparator.comparing(TipoMembresia::getNombre, Comparator.nullsLast(String::compareToIgnoreCase)))
+                .toList());
 
         model.addAttribute("metodosPagoDisponibles", metodoPagoRepository.findAll().stream()
                 .sorted(Comparator.comparing(MetodoPago::getTipoTransferencia, Comparator.nullsLast(String::compareToIgnoreCase)))
@@ -295,22 +333,36 @@ public class AdminPagoController {
                 .sorted(Comparator.comparing(Empleado::getIdEmpleado, Comparator.nullsLast(Long::compareTo)).reversed())
                 .toList());
 
-        String resumenMembresia = "";
+        String membresiaActualTexto = "Seleccione un cliente para consultar su membresía actual.";
+        BigDecimal montoSugerido = null;
+
         if (pagoForm.getUsuario() != null && pagoForm.getUsuario().getIdUsuario() != null) {
             Optional<Membresia> membresiaOpt = membresiaRepository.findByUsuarioIdUsuario(pagoForm.getUsuario().getIdUsuario());
             if (membresiaOpt.isPresent()) {
-                Membresia m = membresiaOpt.get();
-                resumenMembresia = "ID " + m.getIdMembresia()
-                        + " - "
-                        + (m.getTipoMembresia() != null ? m.getTipoMembresia().getNombre() : "Sin tipo");
+                Membresia membresiaActual = membresiaOpt.get();
+                String nombreTipoActual = membresiaActual.getTipoMembresia() != null
+                        ? membresiaActual.getTipoMembresia().getNombre()
+                        : "Sin tipo";
+                membresiaActualTexto = "ID " + membresiaActual.getIdMembresia() + " - " + nombreTipoActual;
+
+                if (modoEdicion && pagoForm.getMembresia().getTipoMembresia().getIdTipoMembresia() == null
+                        && membresiaActual.getTipoMembresia() != null) {
+                    pagoForm.getMembresia().getTipoMembresia()
+                            .setIdTipoMembresia(membresiaActual.getTipoMembresia().getIdTipoMembresia());
+                }
             }
-        } else if (modoEdicion && pagoForm.getMembresia() != null && pagoForm.getMembresia().getIdMembresia() != null) {
-            resumenMembresia = "ID " + pagoForm.getMembresia().getIdMembresia()
-                    + " - "
-                    + (pagoForm.getMembresia().getTipoMembresia() != null ? pagoForm.getMembresia().getTipoMembresia().getNombre() : "Sin tipo");
         }
 
-        model.addAttribute("resumenMembresia", resumenMembresia);
+        if (pagoForm.getMembresia() != null
+                && pagoForm.getMembresia().getTipoMembresia() != null
+                && pagoForm.getMembresia().getTipoMembresia().getIdTipoMembresia() != null) {
+            tipoMembresiaRepository.findById(pagoForm.getMembresia().getTipoMembresia().getIdTipoMembresia())
+                    .ifPresent(tipo -> model.addAttribute("montoSugerido", tipo.getPrecio()));
+        } else {
+            model.addAttribute("montoSugerido", montoSugerido);
+        }
+
+        model.addAttribute("membresiaActualTexto", membresiaActualTexto);
         model.addAttribute("pagoForm", pagoForm);
         model.addAttribute("modoEdicionPago", modoEdicion);
     }
@@ -318,7 +370,9 @@ public class AdminPagoController {
     private Pago nuevoPagoForm() {
         Pago pago = new Pago();
         inicializarRelacionesSiSonNull(pago);
+        pago.getMembresia().setTipoMembresia(new TipoMembresia());
         pago.setActivo("S");
+        pago.setFechaPago(new Date());
         return pago;
     }
 
@@ -338,5 +392,12 @@ public class AdminPagoController {
         if (pago.getEmpleado() == null) {
             pago.setEmpleado(new Empleado());
         }
+    }
+
+    private Date calcularFechaVencimiento(Date fechaInicio, Integer cantidadDias) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fechaInicio);
+        calendar.add(Calendar.DAY_OF_MONTH, cantidadDias);
+        return calendar.getTime();
     }
 }

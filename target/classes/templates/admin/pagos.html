@@ -13,7 +13,7 @@
             <div>
                 <h1 class="display-6 fw-bold mb-2">Pagos</h1>
                 <p class="text-muted mb-0">
-                    Administración de pagos registrados en el sistema.
+                    Registro de pagos y renovación de membresías.
                 </p>
             </div>
             <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
@@ -54,13 +54,44 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Membresía asignada</label>
+                            <label class="form-label fw-semibold">Membresía actual del cliente</label>
                             <input type="text"
                                    class="form-control"
                                    readonly
-                                   th:value="${resumenMembresia != null and !#strings.isEmpty(resumenMembresia) ? resumenMembresia : 'Se asigna automáticamente según el cliente seleccionado'}">
+                                   th:value="${membresiaActualTexto}">
                             <div class="form-text">
-                                El sistema toma automáticamente la membresía registrada del cliente.
+                                Este es el plan actual antes de registrar la renovación o el cambio.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nuevo tipo de membresía a pagar</label>
+                            <select class="form-select"
+                                    th:field="*{membresia.tipoMembresia.idTipoMembresia}"
+                                    id="tipoMembresiaSelect"
+                                    required>
+                                <option value="">Seleccione un tipo de membresía</option>
+                                <option th:each="t : ${tiposMembresiaDisponibles}"
+                                        th:value="${t.idTipoMembresia}"
+                                        th:text="${t.nombre + ' - ' + t.cantidadDias + ' días'}"
+                                        th:attr="data-precio=${t.precio}">
+                                    Tipo
+                                </option>
+                            </select>
+                            <div class="form-text">
+                                Aquí defines si el cliente renovará mensual, trimestral u otro plan disponible.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Monto calculado</label>
+                            <input type="text"
+                                   class="form-control"
+                                   readonly
+                                   id="montoCalculadoTexto"
+                                   th:value="${montoSugerido != null ? ('₡ ' + #numbers.formatDecimal(montoSugerido, 1, 'COMMA', 2, 'POINT')) : 'Seleccione un tipo de membresía'}">
+                            <div class="form-text">
+                                El monto se actualiza automáticamente según el tipo de membresía seleccionado.
                             </div>
                         </div>
 
@@ -101,17 +132,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Monto</label>
-                            <input type="number"
-                                   class="form-control"
-                                   th:field="*{monto}"
-                                   required
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="25000.00">
-                        </div>
-
-                        <div class="mb-3">
                             <label class="form-label fw-semibold">Fecha de pago</label>
                             <input type="date"
                                    class="form-control"
@@ -127,7 +147,7 @@
                                    maxlength="50"
                                    pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+"
                                    title="Solo se permiten letras, números y espacios."
-                                   placeholder="RECIBO 001">
+                                   placeholder="REC0001">
                         </div>
 
                         <div class="mb-3">
@@ -190,8 +210,8 @@
                                 <td th:text="${p.usuario != null ? p.usuario.nombre + ' ' + p.usuario.apellido : 'Sin usuario'}">
                                     Usuario
                                 </td>
-                                <td th:text="${p.membresia != null ? p.membresia.idMembresia : 'Sin membresía'}">
-                                    1
+                                <td th:text="${p.membresia != null && p.membresia.tipoMembresia != null ? p.membresia.tipoMembresia.nombre : 'Sin membresía'}">
+                                    Membresía
                                 </td>
                                 <td th:text="${p.metodoPago != null ? p.metodoPago.tipoTransferencia : 'Sin método'}">
                                     Método
@@ -246,5 +266,34 @@
 </main>
 
 <footer th:replace="~{layout/plantilla :: footer}"></footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tipoSelect = document.getElementById('tipoMembresiaSelect');
+        const montoTexto = document.getElementById('montoCalculadoTexto');
+
+        function formatearMonto(valor) {
+            const numero = parseFloat(valor);
+            if (isNaN(numero)) {
+                return 'Seleccione un tipo de membresía';
+            }
+            return '₡ ' + numero.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function actualizarMonto() {
+            const opcion = tipoSelect.options[tipoSelect.selectedIndex];
+            const precio = opcion ? opcion.getAttribute('data-precio') : null;
+            montoTexto.value = formatearMonto(precio);
+        }
+
+        if (tipoSelect && montoTexto) {
+            tipoSelect.addEventListener('change', actualizarMonto);
+            actualizarMonto();
+        }
+    });
+</script>
 </body>
 </html>
