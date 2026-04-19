@@ -8,7 +8,7 @@
 <body>
 <header th:replace="~{layout/plantilla :: header}"></header>
 
-<section class="py-5 bg-light border-bottom">
+<section class="py-5 bg-light border-bottom" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
@@ -17,21 +17,21 @@
                     Vista temporal mientras se completa el módulo operativo.
                 </p>
             </div>
-            <a th:href="@{/personal/panel}" class="btn btn-outline-secondary">
+            <a th:href="@{/personal/panel}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
                 <i class="fas fa-arrow-left me-1"></i> Volver al panel
             </a>
         </div>
     </div>
 </section>
 
-<main class="container py-5">
+<main class="container py-5" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
     <div class="card shadow border-0">
         <div class="card-header bg-warning text-dark">
             <h5 class="mb-0">Estado del módulo</h5>
         </div>
         <div class="card-body">
             <div class="alert alert-secondary mb-0">
-                El módulo de turnos aún se encuentra en desarrollo.  
+                El módulo de turnos aún se encuentra en desarrollo.
                 Por ahora esta vista se mantiene estable para evitar rutas rotas y dejar la navegación funcional.
             </div>
         </div>

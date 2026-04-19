@@ -2,6 +2,7 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\CurrentUserAdvice.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\PasswordMigrationConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\SecurityConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\ThymeleafConfig.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AccesoController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminBitacoraAccesoController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminCajaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminController.java

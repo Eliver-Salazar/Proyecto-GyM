@@ -17,6 +17,7 @@ com\gym\controller\AdminCajaController.class
 com\gym\service\UsuarioService.class
 com\gym\Repository\TipoMembresiaRepository.class
 com\gym\config\SecurityConfig.class
+com\gym\controller\AccesoController.class
 com\gym\domain\TipoMembresia.class
 com\gym\controller\AdminTipoMembresiaController.class
 com\gym\controller\AdminController.class

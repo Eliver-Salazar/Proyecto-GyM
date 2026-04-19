@@ -8,7 +8,7 @@
 <body>
 <header th:replace="~{layout/plantilla :: header}"></header>
 
-<section class="py-5 bg-light border-bottom">
+<section class="py-5 bg-light border-bottom" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
     <div class="container text-center">
         <h1 class="display-6 fw-bold mb-2">Editar perfil</h1>
         <p class="text-muted mb-0">
@@ -17,7 +17,7 @@
     </div>
 </section>
 
-<main class="container py-5">
+<main class="container py-5" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
     <div class="row justify-content-center">
         <div class="col-lg-9">
             <div class="card shadow border-0">
@@ -77,11 +77,11 @@
                         </div>
 
                         <div class="d-flex justify-content-between flex-wrap gap-2 mt-4">
-                            <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                            <a th:href="@{/perfil}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
                                 <i class="fas fa-arrow-left me-1"></i> Cancelar
                             </a>
 
-                            <button type="submit" class="btn btn-warning text-white">
+                            <button type="submit" class="btn btn-warning text-white" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
                                 <i class="fas fa-save me-1"></i> Guardar cambios
                             </button>
                         </div>
