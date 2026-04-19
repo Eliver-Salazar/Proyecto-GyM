@@ -1,23 +1,17 @@
 package com.gym.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import java.io.Serializable;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "PARAMETROS_SISTEMA")
-public class ParametroSistema implements Serializable {
+public class ParametroSistema {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_PARAMETRO")
     private Long idParametro;
 
-    @Column(name = "CLAVE", nullable = false, length = 50, unique = true)
+    @Column(name = "CLAVE", nullable = false, unique = true, length = 50)
     private String clave;
 
     @Column(name = "VALOR", nullable = false, length = 200)
@@ -25,9 +19,6 @@ public class ParametroSistema implements Serializable {
 
     @Column(name = "DESCRIPCION", length = 200)
     private String descripcion;
-
-    public ParametroSistema() {
-    }
 
     public Long getIdParametro() {
         return idParametro;
