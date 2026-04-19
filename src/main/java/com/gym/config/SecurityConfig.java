@@ -38,6 +38,7 @@ public class SecurityConfig {
                     "/horarios",
                     "/forgot-password",
                     "/forgot-password/done",
+                    "/acceso-denegado",
                     "/css/**",
                     "/js/**",
                     "/images/**",
@@ -65,6 +66,10 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
+            )
+
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/acceso-denegado")
             );
 
         return http.build();

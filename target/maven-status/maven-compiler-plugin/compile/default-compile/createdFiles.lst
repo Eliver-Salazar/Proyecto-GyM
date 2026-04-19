@@ -8,6 +8,7 @@ com\gym\controller\AuthController.class
 com\gym\service\MembresiaServiceImpl.class
 com\gym\config\ThymeleafConfig.class
 com\gym\domain\Membresia.class
+com\gym\controller\AdminReporteController$ReportePagoItem.class
 com\gym\domain\EstadoMembresia.class
 com\gym\service\UsuarioServiceImpl.class
 com\gym\controller\AdminRolController.class
@@ -33,6 +34,7 @@ com\gym\Repository\MembresiaRepository.class
 com\gym\controller\IndexController.class
 com\gym\domain\ParametroSistema.class
 com\gym\domain\Usuario.class
+com\gym\controller\AdminReporteController.class
 com\gym\Repository\EstadoMembresiaRepository.class
 com\gym\domain\Pago.class
 com\gym\service\MembresiaService.class
@@ -44,7 +46,10 @@ com\gym\controller\PerfilController.class
 com\gym\controller\AdminMembresiaController.class
 com\gym\Repository\EmpleadoRepository.class
 com\gym\Repository\MetodoPagoRepository.class
+com\gym\controller\AdminBitacoraAccesoController.class
+com\gym\controller\AdminParametroSistemaController.class
 com\gym\service\CustomUserDetailsService.class
 com\gym\domain\BitacoraAcceso.class
 com\gym\controller\AdminPagoController.class
+com\gym\controller\AdminReporteController$ReporteVencimientoItem.class
 com\gym\Repository\SucursalRepository.class
