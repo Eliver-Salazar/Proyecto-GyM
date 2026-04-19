@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-public class EstadoMembresiaAdminController {
+public class AdminEstadoMembresiaController {
 
     private static final Pattern SOLO_LETRAS_Y_ESPACIOS =
             Pattern.compile("^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$");
 
     private final EstadoMembresiaRepository estadoMembresiaRepository;
 
-    public EstadoMembresiaAdminController(EstadoMembresiaRepository estadoMembresiaRepository) {
+    public AdminEstadoMembresiaController(EstadoMembresiaRepository estadoMembresiaRepository) {
         this.estadoMembresiaRepository = estadoMembresiaRepository;
     }
 

@@ -1,5 +1,4 @@
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\CurrentUserAdvice.java
-E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\PasswordMigrationConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\SecurityConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\config\ThymeleafConfig.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AccesoController.java
@@ -7,6 +6,7 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminBitacoraAccesoContr
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminCajaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminEmpleadoController.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminEstadoMembresiaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminMembresiaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminMetodoPagoController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminPagoController.java
@@ -17,7 +17,6 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminSucursalController.
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminTipoMembresiaController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AdminUsuarioController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\AuthController.java
-E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\EstadoMembresiaAdminController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\IndexController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\PasswordController.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\controller\PerfilController.java
@@ -48,7 +47,5 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\SucursalRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\TipoMembresiaRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\UsuarioRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\CustomUserDetailsService.java
-E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\MembresiaService.java
-E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\MembresiaServiceImpl.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\UsuarioService.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\UsuarioServiceImpl.java
