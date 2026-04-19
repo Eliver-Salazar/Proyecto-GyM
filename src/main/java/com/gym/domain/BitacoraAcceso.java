@@ -1,34 +1,26 @@
 package com.gym.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import java.io.Serializable;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "BITACORA_ACCESO")
-public class BitacoraAcceso implements Serializable {
+public class BitacoraAcceso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_ACCESO")
     private Long idAcceso;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_USUARIO", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
     private Sucursal sucursal;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "FECHA_HORA", nullable = false)
     private Date fechaHora;
 
@@ -37,9 +29,6 @@ public class BitacoraAcceso implements Serializable {
 
     @Column(name = "MOTIVO", length = 120)
     private String motivo;
-
-    public BitacoraAcceso() {
-    }
 
     public Long getIdAcceso() {
         return idAcceso;
