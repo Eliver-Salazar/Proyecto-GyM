@@ -3,7 +3,6 @@ package com.gym.service;
 import com.gym.Repository.UsuarioRepository;
 import com.gym.domain.Usuario;
 import java.util.List;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
-                              PasswordEncoder passwordEncoder) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -70,16 +66,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setCondicionMedica(usuario.getCondicionMedica().trim());
         }
 
-        String contrasenia = usuario.getContrasenia();
-        if (contrasenia != null && !contrasenia.isBlank()) {
-            boolean yaEsHash =
-                    contrasenia.startsWith("$2a$")
-                    || contrasenia.startsWith("$2b$")
-                    || contrasenia.startsWith("$2y$");
-
-            if (!yaEsHash) {
-                usuario.setContrasenia(passwordEncoder.encode(contrasenia));
-            }
+        if (usuario.getContrasenia() != null) {
+            usuario.setContrasenia(usuario.getContrasenia().trim());
         }
 
         return usuarioRepository.save(usuario);

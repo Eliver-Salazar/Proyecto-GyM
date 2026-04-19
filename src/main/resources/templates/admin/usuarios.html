@@ -100,11 +100,14 @@
                                         <label class="form-label fw-semibold">
                                             Contraseña
                                             <span class="text-muted"
-                                                  th:text="${modoEdicion} ? '(opcional si no desea cambiarla)' : '(si se deja vacía se usará 1234)'">
-                                                (si se deja vacía se usará 1234)
+                                                  th:text="${modoEdicion} ? '(opcional si no desea cambiarla)' : '(obligatoria)'">
+                                                (obligatoria)
                                             </span>
                                         </label>
-                                        <input type="text" class="form-control" th:field="*{contrasenia}">
+                                        <input type="text"
+                                               class="form-control"
+                                               th:field="*{contrasenia}"
+                                               th:attr="required=${modoEdicion} ? null : 'required'">
                                     </div>
 
                                     <div class="col-md-6">

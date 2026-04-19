@@ -117,6 +117,12 @@ public class AdminUsuarioController {
             usuarioGuardar.setFotoPerfil(new byte[]{0});
         }
 
+        if (!esEdicion && (usuarioForm.getContrasenia() == null || usuarioForm.getContrasenia().isBlank())) {
+            model.addAttribute("error", "La contraseña es obligatoria al crear un usuario.");
+            prepararVistaUsuarios(model, usuarioForm, false);
+            return "admin/usuarios";
+        }
+
         usuarioGuardar.setNombre(usuarioForm.getNombre());
         usuarioGuardar.setApellido(usuarioForm.getApellido());
         usuarioGuardar.setCorreo(usuarioForm.getCorreo());
@@ -129,12 +135,9 @@ public class AdminUsuarioController {
         usuarioGuardar.setRol(rolOpt.get());
 
         if (!esEdicion) {
-            String password = (usuarioForm.getContrasenia() == null || usuarioForm.getContrasenia().isBlank())
-                    ? "1234"
-                    : usuarioForm.getContrasenia();
-            usuarioGuardar.setContrasenia(password);
+            usuarioGuardar.setContrasenia(usuarioForm.getContrasenia().trim());
         } else if (usuarioForm.getContrasenia() != null && !usuarioForm.getContrasenia().isBlank()) {
-            usuarioGuardar.setContrasenia(usuarioForm.getContrasenia());
+            usuarioGuardar.setContrasenia(usuarioForm.getContrasenia().trim());
         }
 
         try {
