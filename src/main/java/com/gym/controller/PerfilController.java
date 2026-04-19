@@ -78,11 +78,16 @@ public class PerfilController {
 
         long diasRestantes = calcularDiasRestantes(membresiaActual);
 
+        String estadoVigencia = determinarEstadoVigencia(membresiaActual, diasRestantes);
+        String accesoGlobalTexto = obtenerAccesoGlobalTexto(membresiaActual);
+
         model.addAttribute("membresiaActual", membresiaActual);
         model.addAttribute("pagosRecientes", pagosRecientes);
         model.addAttribute("accesosRecientes", accesosRecientes);
         model.addAttribute("totalPagadoReciente", totalPagado);
         model.addAttribute("diasRestantes", diasRestantes);
+        model.addAttribute("estadoVigencia", estadoVigencia);
+        model.addAttribute("accesoGlobalTexto", accesoGlobalTexto);
 
         return "perfil";
     }
@@ -155,5 +160,31 @@ public class PerfilController {
         long dias = diferencia / (1000L * 60L * 60L * 24L);
 
         return Math.max(dias, 0);
+    }
+
+    private String determinarEstadoVigencia(Membresia membresiaActual, long diasRestantes) {
+        if (membresiaActual == null) {
+            return "SIN MEMBRESÍA";
+        }
+
+        if (membresiaActual.getEstadoMembresia() != null
+                && membresiaActual.getEstadoMembresia().getNombreEstado() != null
+                && !membresiaActual.getEstadoMembresia().getNombreEstado().isBlank()) {
+            return membresiaActual.getEstadoMembresia().getNombreEstado();
+        }
+
+        return diasRestantes > 0 ? "ACTIVA" : "VENCIDA";
+    }
+
+    private String obtenerAccesoGlobalTexto(Membresia membresiaActual) {
+        if (membresiaActual == null
+                || membresiaActual.getTipoMembresia() == null
+                || membresiaActual.getTipoMembresia().getAccesoGlobal() == null) {
+            return "No definido";
+        }
+
+        return "S".equalsIgnoreCase(membresiaActual.getTipoMembresia().getAccesoGlobal())
+                ? "Sí"
+                : "No";
     }
 }

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface MetodoPagoRepository extends JpaRepository<MetodoPago, Long> {
 
     Optional<MetodoPago> findByTipoTransferencia(String tipoTransferencia);
+
+    Optional<MetodoPago> findByTipoTransferenciaIgnoreCase(String tipoTransferencia);
 }

@@ -9,9 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "PAGOS")
@@ -42,9 +45,11 @@ public class Pago implements Serializable {
     @JoinColumn(name = "ID_EMPLEADO", nullable = false)
     private Empleado empleado;
 
-    @Column(name = "MONTO", nullable = false, precision = 10, scale = 2)
+    @Column(name = "MONTO", nullable = false)
     private BigDecimal monto;
 
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "FECHA_PAGO", nullable = false)
     private Date fechaPago;
 
@@ -52,7 +57,7 @@ public class Pago implements Serializable {
     private String referencia;
 
     @Column(name = "ACTIVO", nullable = false, length = 1)
-    private String activo = "A";
+    private String activo;
 
     public Pago() {
     }

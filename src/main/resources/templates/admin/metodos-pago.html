@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">Métodos de pago</h1>
+                <p class="text-muted mb-0">
+                    Administración del catálogo de métodos de pago disponibles en el sistema.
+                </p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"
+                        th:text="${modoEdicionMetodoPago ? 'Editar método de pago' : 'Registrar método de pago'}">
+                        Registrar método de pago
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/admin/metodos-pago/guardar}" th:object="${metodoPagoForm}" method="post">
+                        <input type="hidden" th:field="*{idMetodoPago}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Método de pago</label>
+                            <input type="text"
+                                   class="form-control"
+                                   th:field="*{tipoTransferencia}"
+                                   required
+                                   maxlength="40"
+                                   pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+"
+                                   title="Solo se permiten letras, números y espacios."
+                                   placeholder="EFECTIVO">
+                            <div class="form-text">
+                                Solo letras, números y espacios. Ejemplos: EFECTIVO, SINPE MOVIL, TRANSFERENCIA.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning text-white">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${modoEdicionMetodoPago ? 'Actualizar método' : 'Guardar método'}">
+                                    Guardar método
+                                </span>
+                            </button>
+
+                            <a th:if="${modoEdicionMetodoPago}"
+                               th:href="@{/admin/metodos-pago}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Métodos registrados</h4>
+                </div>
+
+                <div class="card-body p-0"
+                     th:if="${metodosPagoListado != null and !#lists.isEmpty(metodosPagoListado)}">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Método</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="m : ${metodosPagoListado}">
+                                <td th:text="${m.idMetodoPago}">1</td>
+                                <td>
+                                    <span class="badge bg-secondary fs-6"
+                                          th:text="${m.tipoTransferencia}">
+                                        EFECTIVO
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a th:href="@{/admin/metodos-pago/editar/{id}(id=${m.idMetodoPago})}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Editar">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+
+                                        <form th:action="@{/admin/metodos-pago/eliminar/{id}(id=${m.idMetodoPago})}"
+                                              method="post"
+                                              onsubmit="return confirm('¿Deseas eliminar este método de pago?');">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-body"
+                     th:if="${metodosPagoListado == null or #lists.isEmpty(metodosPagoListado)}">
+                    <div class="alert alert-secondary mb-0">
+                        No hay métodos de pago registrados todavía.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
