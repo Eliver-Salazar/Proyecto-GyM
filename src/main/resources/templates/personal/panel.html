@@ -73,6 +73,19 @@
                         <a th:href="@{/personal/socios}" class="btn btn-warning text-white" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
                             <i class="fas fa-address-book me-1"></i> Ver socios
                         </a>
+
+                        <a th:href="@{/personal/membresias}" class="btn btn-dark" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-id-card me-1"></i> Ver membresías
+                        </a>
+
+                        <a th:href="@{/personal/pagos}" class="btn btn-outline-dark" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-money-bill-wave me-1"></i> Ver pagos
+                        </a>
+
+                        <a th:href="@{/personal/accesos}" class="btn btn-outline-primary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-door-open me-1"></i> Ver accesos
+                        </a>
+
                         <a th:href="@{/perfil}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
                             <i class="fas fa-user me-1"></i> Mi perfil
                         </a>
@@ -159,6 +172,18 @@
                             <i class="fas fa-users me-2"></i>Consultar socios
                         </a>
 
+                        <a th:href="@{/personal/membresias}" class="btn btn-outline-dark" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-id-card me-2"></i>Consultar membresías
+                        </a>
+
+                        <a th:href="@{/personal/pagos}" class="btn btn-outline-dark" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-money-check-alt me-2"></i>Consultar pagos
+                        </a>
+
+                        <a th:href="@{/personal/accesos}" class="btn btn-outline-primary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                            <i class="fas fa-door-open me-2"></i>Consultar accesos
+                        </a>
+
                         <a th:href="@{/perfil}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL','CLIENTE')">
                             <i class="fas fa-user-circle me-2"></i>Mi perfil
                         </a>
@@ -171,7 +196,7 @@
                     <hr>
 
                     <p class="text-muted mb-0">
-                        Este panel queda preparado para conectar luego pagos, membresías y operación diaria.
+                        Panel operativo orientado a consulta diaria de socios, membresías, pagos y accesos del gimnasio.
                     </p>
                 </div>
             </div>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Membresías registradas</h1>
+                <p class="text-muted mb-0">
+                    Consulta operativa de membresías visibles para el panel del personal.
+                </p>
+            </div>
+
+            <a th:href="@{/personal/panel}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Listado de membresías</h5>
+        </div>
+
+        <div class="card-body" th:if="${membresias != null and !#lists.isEmpty(membresias)}">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Correo</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Sucursal</th>
+                        <th>Inicio</th>
+                        <th>Vencimiento</th>
+                        <th>Precio</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${membresias}">
+                        <td th:text="${m.idMembresia}">1</td>
+
+                        <td th:text="${m.usuario != null ? ((m.usuario.nombre != null ? m.usuario.nombre : '') + ' ' + (m.usuario.apellido != null ? m.usuario.apellido : '')) : 'Sin usuario'}">
+                            Nombre Cliente
+                        </td>
+
+                        <td th:text="${m.usuario != null && m.usuario.correo != null ? m.usuario.correo : 'No registrado'}">
+                            correo@gym.com
+                        </td>
+
+                        <td th:text="${m.tipoMembresia != null && m.tipoMembresia.nombre != null ? m.tipoMembresia.nombre : 'Sin tipo'}">
+                            Mensual
+                        </td>
+
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${
+                                      m.estadoMembresia != null and m.estadoMembresia.nombreEstado != null and
+                                      #strings.equalsIgnoreCase(m.estadoMembresia.nombreEstado, 'ACTIVA')
+                                      ? ' bg-success' :
+                                      (m.estadoMembresia != null and m.estadoMembresia.nombreEstado != null and
+                                      #strings.equalsIgnoreCase(m.estadoMembresia.nombreEstado, 'VENCIDA')
+                                      ? ' bg-danger' : ' bg-secondary')
+                                  }"
+                                  th:text="${m.estadoMembresia != null && m.estadoMembresia.nombreEstado != null ? m.estadoMembresia.nombreEstado : 'SIN ESTADO'}">
+                                ACTIVA
+                            </span>
+                        </td>
+
+                        <td th:text="${m.sucursal != null && m.sucursal.nombre != null ? m.sucursal.nombre : 'Sin sucursal'}">
+                            WarriorGym Central
+                        </td>
+
+                        <td th:text="${m.fechaInicio != null ? #dates.format(m.fechaInicio, 'dd/MM/yyyy') : 'Sin fecha'}">
+                            01/03/2026
+                        </td>
+
+                        <td th:text="${m.fechaVencimiento != null ? #dates.format(m.fechaVencimiento, 'dd/MM/yyyy') : 'Sin fecha'}">
+                            31/03/2026
+                        </td>
+
+                        <td th:text="${m.tipoMembresia != null && m.tipoMembresia.precio != null ? ('₡ ' + #numbers.formatDecimal(m.tipoMembresia.precio, 1, 'COMMA', 2, 'POINT')) : '₡ 0.00'}">
+                            ₡ 25,000.00
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" th:if="${membresias == null or #lists.isEmpty(membresias)}">
+            <div class="alert alert-secondary mb-0">
+                No hay membresías registradas para mostrar.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

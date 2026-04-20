@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Pagos registrados</h1>
+                <p class="text-muted mb-0">
+                    Consulta operativa de pagos visibles para el panel del personal.
+                </p>
+            </div>
+
+            <a th:href="@{/personal/panel}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Listado de pagos</h5>
+        </div>
+
+        <div class="card-body" th:if="${pagos != null and !#lists.isEmpty(pagos)}">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Membresía</th>
+                        <th>Método</th>
+                        <th>Caja</th>
+                        <th>Empleado</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Referencia</th>
+                        <th>Activo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${pagos}">
+                        <td th:text="${p.idPago}">1</td>
+
+                        <td th:text="${p.usuario != null ? ((p.usuario.nombre != null ? p.usuario.nombre : '') + ' ' + (p.usuario.apellido != null ? p.usuario.apellido : '')) : 'Sin usuario'}">
+                            Cliente
+                        </td>
+
+                        <td th:text="${p.membresia != null and p.membresia.tipoMembresia != null and p.membresia.tipoMembresia.nombre != null ? p.membresia.tipoMembresia.nombre : 'Sin membresía'}">
+                            Mensual
+                        </td>
+
+                        <td th:text="${p.metodoPago != null && p.metodoPago.tipoTransferencia != null ? p.metodoPago.tipoTransferencia : 'Sin método'}">
+                            EFECTIVO
+                        </td>
+
+                        <td th:text="${p.caja != null && p.caja.nombre != null ? p.caja.nombre : 'Sin caja'}">
+                            Caja 1
+                        </td>
+
+                        <td th:text="${p.empleado != null and p.empleado.usuario != null ? ((p.empleado.usuario.nombre != null ? p.empleado.usuario.nombre : '') + ' ' + (p.empleado.usuario.apellido != null ? p.empleado.usuario.apellido : '')) : 'Sin empleado'}">
+                            Luis Ramírez
+                        </td>
+
+                        <td th:text="${p.monto != null ? ('₡ ' + #numbers.formatDecimal(p.monto, 1, 'COMMA', 2, 'POINT')) : '₡ 0.00'}">
+                            ₡ 25,000.00
+                        </td>
+
+                        <td th:text="${p.fechaPago != null ? #dates.format(p.fechaPago, 'dd/MM/yyyy') : 'Sin fecha'}">
+                            20/04/2026
+                        </td>
+
+                        <td th:text="${p.referencia != null ? p.referencia : 'Sin referencia'}">
+                            REF-001
+                        </td>
+
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${p.activo != null and #strings.equalsIgnoreCase(p.activo, 'S') ? ' bg-success' : ' bg-danger'}"
+                                  th:text="${p.activo != null and #strings.equalsIgnoreCase(p.activo, 'S') ? 'ACTIVO' : 'INACTIVO'}">
+                                ACTIVO
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" th:if="${pagos == null or #lists.isEmpty(pagos)}">
+            <div class="alert alert-secondary mb-0">
+                No hay pagos registrados para mostrar.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>

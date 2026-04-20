@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{layout/plantilla :: head}"></head>
+
+<body>
+<header th:replace="~{layout/plantilla :: header}"></header>
+
+<section class="py-5 bg-light border-bottom" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Accesos registrados</h1>
+                <p class="text-muted mb-0">
+                    Consulta operativa de accesos visibles para el panel del personal.
+                </p>
+            </div>
+
+            <a th:href="@{/personal/panel}" class="btn btn-outline-secondary" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+                <i class="fas fa-arrow-left me-1"></i> Volver al panel
+            </a>
+        </div>
+    </div>
+</section>
+
+<main class="container py-5" sec:authorize="hasAnyRole('ADMIN','PERSONAL')">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Listado de accesos</h5>
+        </div>
+
+        <div class="card-body" th:if="${accesos != null and !#lists.isEmpty(accesos)}">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Sucursal</th>
+                        <th>Fecha y hora</th>
+                        <th>Resultado</th>
+                        <th>Motivo</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${accesos}">
+                        <td th:text="${a.idAcceso}">1</td>
+
+                        <td th:text="${a.usuario != null ? ((a.usuario.nombre != null ? a.usuario.nombre : '') + ' ' + (a.usuario.apellido != null ? a.usuario.apellido : '')) : 'Sin usuario'}">
+                            Cliente
+                        </td>
+
+                        <td th:text="${a.sucursal != null && a.sucursal.nombre != null ? a.sucursal.nombre : 'Sin sucursal'}">
+                            WarriorGym Central
+                        </td>
+
+                        <td th:text="${a.fechaHora != null ? #dates.format(a.fechaHora, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}">
+                            20/04/2026 14:30
+                        </td>
+
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${
+                                      a.resultado != null and #strings.equalsIgnoreCase(a.resultado, 'PERMITIDO')
+                                      ? ' bg-success'
+                                      : (a.resultado != null and #strings.equalsIgnoreCase(a.resultado, 'DENEGADO')
+                                      ? ' bg-danger'
+                                      : ' bg-secondary')
+                                  }"
+                                  th:text="${a.resultado != null ? a.resultado : 'SIN RESULTADO'}">
+                                PERMITIDO
+                            </span>
+                        </td>
+
+                        <td th:text="${a.motivo != null and !#strings.isEmpty(a.motivo) ? a.motivo : 'Sin motivo registrado'}">
+                            Ingreso correcto
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" th:if="${accesos == null or #lists.isEmpty(accesos)}">
+            <div class="alert alert-secondary mb-0">
+                No hay accesos registrados para mostrar.
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{layout/plantilla :: footer}"></footer>
+</body>
+</html>
