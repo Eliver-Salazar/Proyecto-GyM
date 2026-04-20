@@ -1,16 +1,16 @@
 package com.gym.controller;
 
-import com.gym.Repository.BitacoraAccesoRepository;
 import com.gym.Repository.MembresiaRepository;
 import com.gym.Repository.PagoRepository;
 import com.gym.Repository.UsuarioRepository;
-import com.gym.domain.BitacoraAcceso;
 import com.gym.domain.Membresia;
 import com.gym.domain.Pago;
 import com.gym.domain.Usuario;
 import com.gym.service.UsuarioService;
+import com.gym.service.oracle.OracleBitacoraService;
+import com.gym.service.oracle.OraclePackageException;
+import com.gym.service.oracle.dto.BitacoraAccesoOracleDto;
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.security.Principal;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,19 +33,19 @@ public class PerfilController {
     private final UsuarioRepository usuarioRepository;
     private final MembresiaRepository membresiaRepository;
     private final PagoRepository pagoRepository;
-    private final BitacoraAccesoRepository bitacoraAccesoRepository;
     private final UsuarioService usuarioService;
+    private final OracleBitacoraService oracleBitacoraService;
 
     public PerfilController(UsuarioRepository usuarioRepository,
                             MembresiaRepository membresiaRepository,
                             PagoRepository pagoRepository,
-                            BitacoraAccesoRepository bitacoraAccesoRepository,
-                            UsuarioService usuarioService) {
+                            UsuarioService usuarioService,
+                            OracleBitacoraService oracleBitacoraService) {
         this.usuarioRepository = usuarioRepository;
         this.membresiaRepository = membresiaRepository;
         this.pagoRepository = pagoRepository;
-        this.bitacoraAccesoRepository = bitacoraAccesoRepository;
         this.usuarioService = usuarioService;
+        this.oracleBitacoraService = oracleBitacoraService;
     }
 
     @GetMapping({"/perfil", "/usuario/perfil"})
@@ -70,11 +71,22 @@ public class PerfilController {
                 .limit(5)
                 .toList();
 
-        List<BitacoraAcceso> accesosRecientes = bitacoraAccesoRepository
-                .findByUsuarioIdUsuarioOrderByFechaHoraDesc(usuario.getIdUsuario())
-                .stream()
-                .limit(5)
-                .toList();
+        List<BitacoraAccesoOracleDto> accesosRecientes;
+        int accesosDenegados;
+
+        try {
+            accesosRecientes = oracleBitacoraService.listarAccesosPorUsuario(usuario.getIdUsuario())
+                    .stream()
+                    .limit(5)
+                    .toList();
+
+            accesosDenegados = oracleBitacoraService.contarAccesosDenegadosUsuario(usuario.getIdUsuario());
+
+        } catch (OraclePackageException ex) {
+            accesosRecientes = List.of();
+            accesosDenegados = 0;
+            model.addAttribute("advertenciaBitacora", ex.getMessage());
+        }
 
         BigDecimal totalPagado = pagosRecientes.stream()
                 .map(p -> p.getMonto() != null ? p.getMonto() : BigDecimal.ZERO)
@@ -87,6 +99,7 @@ public class PerfilController {
         model.addAttribute("membresiaActual", membresiaActual);
         model.addAttribute("pagosRecientes", pagosRecientes);
         model.addAttribute("accesosRecientes", accesosRecientes);
+        model.addAttribute("accesosDenegados", accesosDenegados);
         model.addAttribute("totalPagadoReciente", totalPagado);
         model.addAttribute("diasRestantes", diasRestantes);
         model.addAttribute("estadoVigencia", estadoVigencia);
