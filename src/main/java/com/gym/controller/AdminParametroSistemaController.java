@@ -2,6 +2,8 @@ package com.gym.controller;
 
 import com.gym.Repository.ParametroSistemaRepository;
 import com.gym.domain.ParametroSistema;
+import com.gym.service.oracle.OraclePackageException;
+import com.gym.service.oracle.OracleParametroService;
 import java.util.regex.Pattern;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -18,9 +20,12 @@ public class AdminParametroSistemaController {
     private static final Pattern CLAVE_PATTERN = Pattern.compile("^[A-Z0-9_]+$");
 
     private final ParametroSistemaRepository parametroSistemaRepository;
+    private final OracleParametroService oracleParametroService;
 
-    public AdminParametroSistemaController(ParametroSistemaRepository parametroSistemaRepository) {
+    public AdminParametroSistemaController(ParametroSistemaRepository parametroSistemaRepository,
+                                           OracleParametroService oracleParametroService) {
         this.parametroSistemaRepository = parametroSistemaRepository;
+        this.oracleParametroService = oracleParametroService;
     }
 
     @GetMapping("/admin/parametros-sistema")
@@ -31,8 +36,8 @@ public class AdminParametroSistemaController {
 
     @GetMapping("/admin/parametros-sistema/editar/{id}")
     public String editarParametro(@PathVariable("id") Long id,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
 
         var parametroOpt = parametroSistemaRepository.findById(id);
 
@@ -47,8 +52,8 @@ public class AdminParametroSistemaController {
 
     @PostMapping("/admin/parametros-sistema/guardar")
     public String guardarParametro(@ModelAttribute("parametroForm") ParametroSistema parametroForm,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
 
         boolean modoEdicion = parametroForm.getIdParametro() != null;
 
@@ -67,30 +72,42 @@ public class AdminParametroSistemaController {
             return "admin/parametros-sistema";
         }
 
-        ParametroSistema parametroGuardar;
-
         if (modoEdicion) {
             var parametroOpt = parametroSistemaRepository.findById(parametroForm.getIdParametro());
             if (parametroOpt.isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "El parámetro a editar ya no existe.");
                 return "redirect:/admin/parametros-sistema";
             }
-            parametroGuardar = parametroOpt.get();
-        } else {
-            parametroGuardar = new ParametroSistema();
         }
 
-        parametroGuardar.setClave(claveNormalizada);
-        parametroGuardar.setValor(valorNormalizado);
-        parametroGuardar.setDescripcion(descripcionNormalizada);
-
         try {
-            parametroSistemaRepository.save(parametroGuardar);
+            if (modoEdicion) {
+                oracleParametroService.actualizarParametro(
+                        parametroForm.getIdParametro(),
+                        claveNormalizada,
+                        valorNormalizado,
+                        descripcionNormalizada
+                );
+            } else {
+                oracleParametroService.crearParametro(
+                        claveNormalizada,
+                        valorNormalizado,
+                        descripcionNormalizada
+                );
+            }
+
+        } catch (OraclePackageException ex) {
+            model.addAttribute("error", traducirErrorOracle(ex));
+            model.addAttribute("errorTecnico", obtenerDetalleTecnico(ex));
+            cargarVista(model, parametroForm, modoEdicion);
+            return "admin/parametros-sistema";
+
         } catch (DataIntegrityViolationException ex) {
             model.addAttribute("error", "No se pudo guardar el parámetro por una restricción de base de datos.");
             model.addAttribute("errorTecnico", obtenerDetalleTecnico(ex));
             cargarVista(model, parametroForm, modoEdicion);
             return "admin/parametros-sistema";
+
         } catch (Exception ex) {
             model.addAttribute("error", "Ocurrió un error inesperado al guardar el parámetro.");
             model.addAttribute("errorTecnico", ex.getMessage());
@@ -108,7 +125,7 @@ public class AdminParametroSistemaController {
 
     @PostMapping("/admin/parametros-sistema/eliminar/{id}")
     public String eliminarParametro(@PathVariable("id") Long id,
-            RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes) {
 
         var parametroOpt = parametroSistemaRepository.findById(id);
 
@@ -118,13 +135,18 @@ public class AdminParametroSistemaController {
         }
 
         try {
-            parametroSistemaRepository.deleteById(id);
+            oracleParametroService.eliminarParametro(id);
             redirectAttributes.addFlashAttribute("mensaje", "Parámetro eliminado correctamente.");
+
+        } catch (OraclePackageException ex) {
+            redirectAttributes.addFlashAttribute("error", traducirErrorOracle(ex));
+
         } catch (DataIntegrityViolationException ex) {
             redirectAttributes.addFlashAttribute(
                     "error",
                     "No se pudo eliminar el parámetro por una restricción de integridad."
             );
+
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute(
                     "error",
@@ -199,8 +221,38 @@ public class AdminParametroSistemaController {
         return limpio.isBlank() ? null : limpio;
     }
 
-    private String obtenerDetalleTecnico(Throwable ex) {
+    private String traducirErrorOracle(Throwable ex) {
+        String detalle = obtenerDetalleTecnico(ex);
 
+        if (detalle == null || detalle.isBlank()) {
+            return "Ocurrió un error al procesar el parámetro con Oracle.";
+        }
+
+        String upper = detalle.toUpperCase();
+
+        if (upper.contains("ORA-20501")) {
+            return "La clave del parámetro es obligatoria.";
+        }
+        if (upper.contains("ORA-20502")) {
+            return "Ya existe un parámetro con esa clave.";
+        }
+        if (upper.contains("ORA-20503")) {
+            return "El parámetro indicado no existe.";
+        }
+        if (upper.contains("ORA-20504")) {
+            return "La clave del parámetro es obligatoria.";
+        }
+        if (upper.contains("ORA-20505")) {
+            return "Ya existe otro parámetro con esa clave.";
+        }
+        if (upper.contains("ORA-20506")) {
+            return "El parámetro indicado no existe.";
+        }
+
+        return "Ocurrió un error al procesar el parámetro en Oracle.";
+    }
+
+    private String obtenerDetalleTecnico(Throwable ex) {
         Throwable causa = ex;
 
         while (causa.getCause() != null && causa.getCause() != causa) {
@@ -211,5 +263,4 @@ public class AdminParametroSistemaController {
                 ? causa.getMessage()
                 : ex.getMessage();
     }
-
 }
