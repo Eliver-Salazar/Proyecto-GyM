@@ -47,5 +47,11 @@ E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\SucursalRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\TipoMembresiaRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\Repository\UsuarioRepository.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\CustomUserDetailsService.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\dto\BitacoraAccesoOracleDto.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\OracleBitacoraService.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\OracleBitacoraServiceImpl.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\OraclePackageException.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\OracleParametroService.java
+E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\oracle\OracleParametroServiceImpl.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\UsuarioService.java
 E:\GitHub\Proyecto-GyM\src\main\java\com\gym\service\UsuarioServiceImpl.java

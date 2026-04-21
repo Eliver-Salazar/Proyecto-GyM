@@ -1,7 +1,9 @@
+com\gym\service\oracle\dto\BitacoraAccesoOracleDto.class
 com\gym\controller\AdminEstadoMembresiaController.class
 com\gym\controller\AdminEmpleadoController.class
 com\gym\domain\Rol.class
 com\gym\Repository\BitacoraAccesoRepository.class
+com\gym\service\oracle\OraclePackageException.class
 com\gym\controller\AdminSucursalController.class
 com\gym\GimnasioApplication.class
 com\gym\controller\AdminMetodoPagoController.class
@@ -13,8 +15,10 @@ com\gym\domain\EstadoMembresia.class
 com\gym\service\UsuarioServiceImpl.class
 com\gym\controller\AdminRolController.class
 com\gym\controller\AdminUsuarioController.class
+com\gym\service\oracle\OracleBitacoraServiceImpl.class
 com\gym\controller\AdminCajaController.class
 com\gym\service\UsuarioService.class
+com\gym\service\oracle\OracleParametroService.class
 com\gym\Repository\TipoMembresiaRepository.class
 com\gym\config\SecurityConfig.class
 com\gym\controller\AccesoController.class
@@ -30,6 +34,7 @@ com\gym\Repository\UsuarioRepository.class
 com\gym\config\CurrentUserAdvice.class
 com\gym\controller\PasswordController.class
 com\gym\Repository\MembresiaRepository.class
+com\gym\service\oracle\OracleBitacoraServiceImpl$BitacoraAccesoOracleRowMapper.class
 com\gym\controller\IndexController.class
 com\gym\domain\ParametroSistema.class
 com\gym\domain\Usuario.class
@@ -47,7 +52,9 @@ com\gym\Repository\MetodoPagoRepository.class
 com\gym\controller\AdminBitacoraAccesoController.class
 com\gym\controller\AdminParametroSistemaController.class
 com\gym\service\CustomUserDetailsService.class
+com\gym\service\oracle\OracleParametroServiceImpl.class
 com\gym\domain\BitacoraAcceso.class
+com\gym\service\oracle\OracleBitacoraService.class
 com\gym\controller\AdminPagoController.class
 com\gym\controller\AdminReporteController$ReporteVencimientoItem.class
 com\gym\Repository\SucursalRepository.class
