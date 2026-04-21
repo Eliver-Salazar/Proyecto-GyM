@@ -2,298 +2,299 @@
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{layout/plantilla :: head}"></head>
+    <head th:replace="~{layout/plantilla :: head}"></head>
 
-<body>
-<header th:replace="~{layout/plantilla :: header}"></header>
+    <body>
+        <header th:replace="~{layout/plantilla :: header}"></header>
 
-<section class="py-5 bg-light border-bottom">
-    <div class="container">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <div>
-                <h1 class="display-6 fw-bold mb-2">Pagos</h1>
-                <p class="text-muted mb-0">
-                    Registro de pagos y renovación de membresías.
-                </p>
-            </div>
-            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Volver al panel
-            </a>
-        </div>
-    </div>
-</section>
-
-<main class="container py-5">
-    <div class="row g-4">
-        <div class="col-lg-5">
-            <div class="card shadow border-0">
-                <div class="card-header bg-warning text-dark">
-                    <h4 class="mb-0"
-                        th:text="${modoEdicionPago ? 'Editar pago' : 'Registrar pago'}">
-                        Registrar pago
-                    </h4>
-                </div>
-
-                <div class="card-body">
-                    <form th:action="@{/admin/pagos/guardar}" th:object="${pagoForm}" method="post">
-                        <input type="hidden" th:field="*{idPago}"/>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Cliente</label>
-                            <select class="form-select" th:field="*{usuario.idUsuario}" required>
-                                <option value="">Seleccione un cliente</option>
-                                <option th:each="u : ${usuariosDisponibles}"
-                                        th:value="${u.idUsuario}"
-                                        th:text="${u.nombre + ' ' + u.apellido + ' - ' + u.correo}">
-                                    Cliente
-                                </option>
-                            </select>
-                            <div class="form-text">
-                                Solo se muestran clientes que ya tienen una membresía registrada.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Membresía actual del cliente</label>
-                            <input type="text"
-                                   class="form-control"
-                                   readonly
-                                   th:value="${membresiaActualTexto}">
-                            <div class="form-text">
-                                Este es el plan actual antes de registrar la renovación o el cambio.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Nuevo tipo de membresía a pagar</label>
-                            <select class="form-select"
-                                    th:field="*{membresia.tipoMembresia.idTipoMembresia}"
-                                    id="tipoMembresiaSelect"
-                                    required>
-                                <option value="">Seleccione un tipo de membresía</option>
-                                <option th:each="t : ${tiposMembresiaDisponibles}"
-                                        th:value="${t.idTipoMembresia}"
-                                        th:text="${t.nombre + ' - ' + t.cantidadDias + ' días'}"
-                                        th:attr="data-precio=${t.precio}">
-                                    Tipo
-                                </option>
-                            </select>
-                            <div class="form-text">
-                                Aquí defines si el cliente renovará mensual, trimestral u otro plan disponible.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Monto calculado</label>
-                            <input type="text"
-                                   class="form-control"
-                                   readonly
-                                   id="montoCalculadoTexto"
-                                   th:value="${montoSugerido != null ? ('₡ ' + #numbers.formatDecimal(montoSugerido, 1, 'COMMA', 2, 'POINT')) : 'Seleccione un tipo de membresía'}">
-                            <div class="form-text">
-                                El monto se actualiza automáticamente según el tipo de membresía seleccionado.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Método de pago</label>
-                            <select class="form-select" th:field="*{metodoPago.idMetodoPago}" required>
-                                <option value="">Seleccione un método</option>
-                                <option th:each="m : ${metodosPagoDisponibles}"
-                                        th:value="${m.idMetodoPago}"
-                                        th:text="${m.tipoTransferencia}">
-                                    Método
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Caja</label>
-                            <select class="form-select" th:field="*{caja.idCaja}" required>
-                                <option value="">Seleccione una caja</option>
-                                <option th:each="c : ${cajasDisponibles}"
-                                        th:value="${c.idCaja}"
-                                        th:text="${c.nombre + ' - ' + (c.sucursal != null ? c.sucursal.nombre : 'Sin sucursal')}">
-                                    Caja
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Empleado</label>
-                            <select class="form-select" th:field="*{empleado.idEmpleado}" required>
-                                <option value="">Seleccione un empleado</option>
-                                <option th:each="e : ${empleadosDisponibles}"
-                                        th:value="${e.idEmpleado}"
-                                        th:text="${(e.usuario != null ? e.usuario.nombre + ' ' + e.usuario.apellido : 'Sin usuario') + ' - ' + e.puesto}">
-                                    Empleado
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Fecha de pago</label>
-                            <input type="date"
-                                   class="form-control"
-                                   th:field="*{fechaPago}"
-                                   required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Referencia</label>
-                            <input type="text"
-                                   class="form-control"
-                                   th:field="*{referencia}"
-                                   maxlength="50"
-                                   pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+"
-                                   title="Solo se permiten letras, números y espacios."
-                                   placeholder="REC0001">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Activo</label>
-                            <select class="form-select" th:field="*{activo}" required>
-                                <option value="S">Sí</option>
-                                <option value="N">No</option>
-                            </select>
-                        </div>
-
-                        <div th:if="${errorTecnicoPago != null}" class="alert alert-warning">
-                            <strong>Detalle técnico:</strong>
-                            <span th:text="${errorTecnicoPago}"></span>
-                        </div>
-
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-warning text-white">
-                                <i class="fas fa-save me-2"></i>
-                                <span th:text="${modoEdicionPago ? 'Actualizar pago' : 'Guardar pago'}">
-                                    Guardar pago
-                                </span>
-                            </button>
-
-                            <a th:if="${modoEdicionPago}"
-                               th:href="@{/admin/pagos}"
-                               class="btn btn-outline-secondary">
-                                Cancelar
-                            </a>
-                        </div>
-                    </form>
+        <section class="py-5 bg-light border-bottom">
+            <div class="container">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                    <div>
+                        <h1 class="display-6 fw-bold mb-2">Pagos</h1>
+                        <p class="text-muted mb-0">
+                            Registro de pagos y renovación de membresías.
+                        </p>
+                    </div>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al panel
+                    </a>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="col-lg-7">
-            <div class="card shadow border-0">
-                <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">Pagos registrados</h4>
-                </div>
+        <main class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-warning text-dark">
+                            <h4 class="mb-0"
+                                th:text="${modoEdicionPago ? 'Editar pago' : 'Registrar pago'}">
+                                Registrar pago
+                            </h4>
+                        </div>
 
-                <div class="card-body p-0"
-                     th:if="${pagosListado != null and !#lists.isEmpty(pagosListado)}">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Usuario</th>
-                                <th>Membresía</th>
-                                <th>Método</th>
-                                <th>Monto</th>
-                                <th>Fecha</th>
-                                <th>Activo</th>
-                                <th class="text-center">Acciones</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="p : ${pagosListado}">
-                                <td th:text="${p.idPago}">1</td>
-                                <td th:text="${p.usuario != null ? p.usuario.nombre + ' ' + p.usuario.apellido : 'Sin usuario'}">
-                                    Usuario
-                                </td>
-                                <td th:text="${p.membresia != null && p.membresia.tipoMembresia != null ? p.membresia.tipoMembresia.nombre : 'Sin membresía'}">
-                                    Membresía
-                                </td>
-                                <td th:text="${p.metodoPago != null ? p.metodoPago.tipoTransferencia : 'Sin método'}">
-                                    Método
-                                </td>
-                                <td th:text="${p.monto != null ? ('₡ ' + #numbers.formatDecimal(p.monto, 1, 'COMMA', 2, 'POINT')) : '₡ 0.00'}">
-                                    ₡ 0.00
-                                </td>
-                                <td th:text="${p.fechaPago != null ? #dates.format(p.fechaPago, 'dd/MM/yyyy') : '—'}">
-                                    01/01/2026
-                                </td>
-                                <td>
-                                    <span class="badge"
-                                          th:classappend="${p.activo != null and p.activo.equalsIgnoreCase('S')} ? ' bg-success' : ' bg-secondary'"
-                                          th:text="${p.activo != null and p.activo.equalsIgnoreCase('S') ? 'Sí' : 'No'}">
-                                        Sí
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a th:href="@{/admin/pagos/editar/{id}(id=${p.idPago})}"
-                                           class="btn btn-sm btn-outline-primary"
-                                           title="Editar">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
+                        <div class="card-body">
+                            <form th:action="@{/admin/pagos/guardar}" th:object="${pagoForm}" method="post">
+                                <input type="hidden" th:field="*{idPago}"/>
 
-                                        <form th:action="@{/admin/pagos/eliminar/{id}(id=${p.idPago})}"
-                                              method="post"
-                                              onsubmit="return confirm('¿Deseas eliminar este pago?');">
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger"
-                                                    title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Cliente</label>
+                                    <select class="form-select" th:field="*{usuario.idUsuario}" required>
+                                        <option value="">Seleccione un cliente</option>
+                                        <option th:each="u : ${usuariosDisponibles}"
+                                                th:value="${u.idUsuario}"
+                                                th:text="${u.nombre + ' ' + u.apellido + ' - ' + u.correo}">
+                                            Cliente
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        Solo se muestran clientes que ya tienen una membresía registrada.
                                     </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Membresía actual del cliente</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           readonly
+                                           th:value="${membresiaActualTexto}">
+                                    <div class="form-text">
+                                        Este es el plan actual antes de registrar la renovación o el cambio.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Nuevo tipo de membresía a pagar</label>
+                                    <select class="form-select"
+                                            th:field="*{membresia.tipoMembresia.idTipoMembresia}"
+                                            id="tipoMembresiaSelect"
+                                            required>
+                                        <option value="">Seleccione un tipo de membresía</option>
+                                        <option th:each="t : ${tiposMembresiaDisponibles}"
+                                                th:value="${t.idTipoMembresia}"
+                                                th:text="${t.nombre + ' - ' + t.cantidadDias + ' días'}"
+                                                th:attr="data-precio=${t.precio}">
+                                            Tipo
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        Aquí defines si el cliente renovará mensual, trimestral u otro plan disponible.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Monto calculado</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           readonly
+                                           id="montoCalculadoTexto"
+                                           th:value="${montoSugerido != null ? ('₡ ' + #numbers.formatDecimal(montoSugerido, 1, 'COMMA', 2, 'POINT')) : 'Seleccione un tipo de membresía'}">
+                                    <div class="form-text">
+                                        El monto se actualiza automáticamente según el tipo de membresía seleccionado.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Método de pago</label>
+                                    <select class="form-select" th:field="*{metodoPago.idMetodoPago}" required>
+                                        <option value="">Seleccione un método</option>
+                                        <option th:each="m : ${metodosPagoDisponibles}"
+                                                th:value="${m.idMetodoPago}"
+                                                th:text="${m.tipoTransferencia}">
+                                            Método
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Caja</label>
+                                    <select class="form-select" th:field="*{caja.idCaja}" required>
+                                        <option value="">Seleccione una caja</option>
+                                        <option th:each="c : ${cajasDisponibles}"
+                                                th:value="${c.idCaja}"
+                                                th:text="${c.nombre + ' - ' + (c.sucursal != null ? c.sucursal.nombre : 'Sin sucursal')}">
+                                            Caja
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Empleado</label>
+                                    <select class="form-select" th:field="*{empleado.idEmpleado}" required>
+                                        <option value="">Seleccione un empleado</option>
+                                        <option th:each="e : ${empleadosDisponibles}"
+                                                th:value="${e.idEmpleado}"
+                                                th:text="${(e.usuario != null ? e.usuario.nombre + ' ' + e.usuario.apellido : 'Sin usuario') + ' - ' + e.puesto}">
+                                            Empleado
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha de pago</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           th:field="*{fechaPago}"
+                                           required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Referencia</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           th:field="*{referencia}"
+                                           maxlength="50"
+                                           pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+"
+                                           title="Solo se permiten letras, números y espacios."
+                                           placeholder="REC0001">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Activo</label>
+                                    <select class="form-select" th:field="*{activo}" required>
+                                        <option value="S">Sí</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </div>
+
+                                <div th:if="${errorTecnicoPago != null}" class="alert alert-warning">
+                                    <strong>Detalle técnico:</strong>
+                                    <span th:text="${errorTecnicoPago}"></span>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-warning text-white">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span th:text="${modoEdicionPago ? 'Actualizar pago' : 'Guardar pago'}">
+                                            Guardar pago
+                                        </span>
+                                    </button>
+
+                                    <a th:if="${modoEdicionPago}"
+                                       th:href="@{/admin/pagos}"
+                                       class="btn btn-outline-secondary">
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-body"
-                     th:if="${pagosListado == null or #lists.isEmpty(pagosListado)}">
-                    <div class="alert alert-secondary mb-0">
-                        No hay pagos registrados todavía.
+                <div class="col-lg-7">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="mb-0">Pagos registrados</h4>
+                        </div>
+
+                        <div class="card-body p-0"
+                             th:if="${pagosListado != null and !#lists.isEmpty(pagosListado)}">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Usuario</th>
+                                            <th>Membresía</th>
+                                            <th>Método</th>
+                                            <th>Monto</th>
+                                            <th>Fecha</th>
+                                            <th>Activo</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="p : ${pagosListado}">
+                                            <td th:text="${p.idPago}">1</td>
+                                            <td th:text="${p.usuario != null ? p.usuario.nombre + ' ' + p.usuario.apellido : 'Sin usuario'}">
+                                                Usuario
+                                            </td>
+                                            <td th:text="${p.membresia != null && p.membresia.tipoMembresia != null ? p.membresia.tipoMembresia.nombre : 'Sin membresía'}">
+                                                Membresía
+                                            </td>
+                                            <td th:text="${p.metodoPago != null ? p.metodoPago.tipoTransferencia : 'Sin método'}">
+                                                Método
+                                            </td>
+                                            <td th:text="${p.monto != null ? ('₡ ' + #numbers.formatDecimal(p.monto, 1, 'COMMA', 2, 'POINT')) : '₡ 0.00'}">
+                                                ₡ 0.00
+                                            </td>
+                                            <td th:text="${p.fechaPago != null ? #dates.format(p.fechaPago, 'dd/MM/yyyy') : '—'}">
+                                                01/01/2026
+                                            </td>
+                                            <td>
+                                                <span class="badge"
+                                                      th:classappend="${p.activo != null and p.activo.equalsIgnoreCase('S')} ? ' bg-success' : ' bg-secondary'"
+                                                      th:text="${p.activo != null and p.activo.equalsIgnoreCase('S') ? 'Sí' : 'No'}">
+                                                    Sí
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a th:href="@{/admin/pagos/editar/{id}(id=${p.idPago})}"
+                                                       class="btn btn-sm btn-outline-primary"
+                                                       title="Editar">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+
+                                                    <form th:action="@{/admin/pagos/eliminar/{id}(id=${p.idPago})}"
+                                                          method="post"
+                                                          onsubmit="return confirm('¿Deseas eliminar este pago?');"
+                                                          class="d-inline">
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                title="Eliminar">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-body"
+                             th:if="${pagosListado == null or #lists.isEmpty(pagosListado)}">
+                            <div class="alert alert-secondary mb-0">
+                                No hay pagos registrados todavía.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</main>
+        </main>
 
-<footer th:replace="~{layout/plantilla :: footer}"></footer>
+        <footer th:replace="~{layout/plantilla :: footer}"></footer>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const tipoSelect = document.getElementById('tipoMembresiaSelect');
-        const montoTexto = document.getElementById('montoCalculadoTexto');
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const tipoSelect = document.getElementById('tipoMembresiaSelect');
+                const montoTexto = document.getElementById('montoCalculadoTexto');
 
-        function formatearMonto(valor) {
-            const numero = parseFloat(valor);
-            if (isNaN(numero)) {
-                return 'Seleccione un tipo de membresía';
-            }
-            return '₡ ' + numero.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+                function formatearMonto(valor) {
+                    const numero = parseFloat(valor);
+                    if (isNaN(numero)) {
+                        return 'Seleccione un tipo de membresía';
+                    }
+                    return '₡ ' + numero.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+
+                function actualizarMonto() {
+                    const opcion = tipoSelect.options[tipoSelect.selectedIndex];
+                    const precio = opcion ? opcion.getAttribute('data-precio') : null;
+                    montoTexto.value = formatearMonto(precio);
+                }
+
+                if (tipoSelect && montoTexto) {
+                    tipoSelect.addEventListener('change', actualizarMonto);
+                    actualizarMonto();
+                }
             });
-        }
-
-        function actualizarMonto() {
-            const opcion = tipoSelect.options[tipoSelect.selectedIndex];
-            const precio = opcion ? opcion.getAttribute('data-precio') : null;
-            montoTexto.value = formatearMonto(precio);
-        }
-
-        if (tipoSelect && montoTexto) {
-            tipoSelect.addEventListener('change', actualizarMonto);
-            actualizarMonto();
-        }
-    });
-</script>
-</body>
+        </script>
+    </body>
 </html>
